@@ -218,11 +218,39 @@
     box-shadow: 0 1px 0 #0d2060, 0 2px 6px rgba(0,0,0,0.3);
   }
   .numpad-btn.selected {
-    background: linear-gradient(145deg, #60a5fa, #2563eb);
-    box-shadow: 0 4px 0 #1e40af, 0 0 20px rgba(96,165,250,0.5), 0 6px 12px rgba(0,0,0,0.3);
+    background: linear-gradient(145deg, #f59e0b, #d97706);
+    color: #1a1a1a;
+    box-shadow: 0 4px 0 #92400e, 0 0 20px rgba(245,158,11,0.5), 0 6px 12px rgba(0,0,0,0.3);
   }
   .numpad-btn.empty { background: transparent; box-shadow: none; pointer-events: none; }
   .numpad-btn.zero { grid-column: 2; }
+  .numpad-btn.backspace { background: linear-gradient(145deg, #374151, #1f2937); font-size: 1.2rem; }
+  .numpad-btn.hint-btn {
+    background: #1f2937;
+    box-shadow: 0 4px 0 #111827, 0 6px 12px rgba(0,0,0,0.3);
+    opacity: 0.5;
+    cursor: not-allowed;
+    position: relative;
+    font-size: 1.2rem;
+  }
+  .numpad-btn.hint-btn.has-hints {
+    background: linear-gradient(145deg, #7c3aed, #5b21b6);
+    box-shadow: 0 4px 0 #3b0764, 0 0 16px rgba(124,58,237,0.4), 0 6px 12px rgba(0,0,0,0.3);
+    opacity: 1;
+    cursor: pointer;
+  }
+  .hint-badge {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: var(--gold);
+    color: #1a1a1a;
+    font-size: 0.6rem;
+    font-weight: 900;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+  }
 
   .submit-btn {
     width: 100%;
@@ -251,7 +279,107 @@
     opacity: 0.6;
   }
 
-  /* ---- FRIEND CHALLENGE SCREEN ---- */
+  /* ---- COUNTDOWN OVERLAY ---- */
+  .countdown-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 21, 69, 0.92);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+  }
+  .countdown-overlay.active { display: flex; }
+  .countdown-number {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    color: white;
+    font-size: 10rem;
+    text-shadow: 0 0 60px rgba(245,158,11,0.8), 0 0 120px rgba(245,158,11,0.4);
+    animation: countZoom 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    line-height: 1;
+  }
+  .countdown-number.gold { color: var(--gold); }
+  .countdown-number.go { font-size: 5rem; color: var(--green); text-shadow: 0 0 60px rgba(34,197,94,0.8); }
+  @keyframes countZoom {
+    0%   { transform: scale(3); opacity: 0; }
+    30%  { transform: scale(1); opacity: 1; }
+    70%  { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.2); opacity: 0; }
+  }
+
+
+  .timer-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    width: 100%;
+    max-width: 320px;
+  }
+  .timer-bar-bg {
+    flex: 1;
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%;
+    border-radius: 10px;
+    background: var(--green);
+    transition: width 1s linear, background 0.3s;
+    width: 100%;
+  }
+  .timer-bar.warning { background: var(--hint-orange); }
+  .timer-bar.danger { background: var(--red); }
+  .timer-num {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: white;
+    min-width: 28px;
+    text-align: right;
+  }
+  .timer-num.danger { color: var(--red); }
+
+  /* Sound toggle */
+  .sound-btn {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5;
+  }
+  /* ---- LEADERBOARD ---- */
+  .lb-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 14px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.08);
+    gap: 12px;
+    font-family: 'Nunito', sans-serif;
+  }
+  .lb-row.me { background: rgba(245,158,11,0.15); border: 1.5px solid var(--gold); }
+  .lb-row.top1 { background: rgba(245,158,11,0.2); border-color: var(--gold); }
+  .lb-row.top2 { background: rgba(148,163,184,0.15); border-color: #94a3b8; }
+  .lb-row.top3 { background: rgba(180,120,60,0.15); border-color: #b4783c; }
+  .lb-rank { font-size: 1.1rem; font-weight: 900; min-width: 32px; text-align: center; color: white; }
+  .lb-name { flex: 1; font-size: 0.95rem; font-weight: 700; color: white; }
+  .lb-tries { font-size: 0.85rem; font-weight: 800; color: #93c5fd; min-width: 50px; text-align: center; }
+  .lb-time { font-size: 0.8rem; font-weight: 600; color: #64748b; min-width: 45px; text-align: right; }
+  .lb-separator { text-align: center; color: #475569; font-size: 0.85rem; padding: 4px 0 8px; letter-spacing: 2px; }
+
   .set-number-title {
     font-family: 'Nunito', sans-serif;
     font-size: 1.5rem;
@@ -484,21 +612,33 @@
   <!-- Stars background -->
   <div class="stars" id="stars"></div>
 
+  <!-- COUNTDOWN OVERLAY -->
+  <div class="countdown-overlay" id="countdown-overlay">
+    <div class="countdown-number" id="countdown-number">3</div>
+  </div>
+
   <!-- HOME SCREEN -->
   <div class="screen active" id="screen-home">
     <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
-      <div style="font-size:4rem; margin-bottom:8px;">🤖</div>
+      <img src="icon-192.png" alt="Beat Me in 3" style="width:90px;height:90px;border-radius:22px;margin-bottom:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
       <h1 class="home-title">Beat Me in <span>3</span></h1>
       <p class="home-subtitle">Guess the number in 3 tries or less</p>
 
       <button class="menu-btn btn-bot" onclick="startBotGame()">
-        <span class="bot-icon">🤖</span> Play vs Bot
+        <span class="bot-icon">⚡</span> Quick Challenge
       </button>
       <button class="menu-btn btn-friend" onclick="showScreen('screen-friend-set')">
         <span>👥</span> Challenge a Friend
       </button>
       <button class="menu-btn btn-daily" onclick="startDailyChallenge()">
-        <span>📅</span> Daily Challenge
+        <span id="calendar-icon" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:white;border-radius:8px;flex-shrink:0;flex-direction:column;line-height:1;overflow:hidden;">
+          <span style="background:#ef4444;color:white;font-size:0.45rem;font-weight:900;width:100%;text-align:center;padding:1px 0;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" id="cal-month"></span>
+          <span style="color:#1a1a1a;font-size:0.85rem;font-weight:900;font-family:'Nunito',sans-serif;" id="cal-day"></span>
+        </span>
+        Daily Challenge
+      </button>
+      <button class="menu-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;" onclick="openLeaderboard()">
+        <span>🏆</span> Leaderboard
       </button>
       <button class="btn-streak" onclick="showStreak()">View Streak 🔥</button>
     </div>
@@ -506,7 +646,8 @@
 
   <!-- GAMEPLAY SCREEN (vs Bot) -->
   <div class="screen" id="screen-game">
-    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <button class="back-btn" onclick="goHome()">←</button>
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔊</button>
     <div class="game-header">
       <div class="game-title">Beat Me in <span>3</span></div>
     </div>
@@ -519,6 +660,11 @@
       <div class="dot" id="dot-2"></div>
     </div>
 
+    <div class="timer-row">
+      <div class="timer-bar-bg"><div class="timer-bar" id="timer-bar"></div></div>
+      <div class="timer-num" id="timer-num">15</div>
+    </div>
+
     <div class="hint-box hint-empty" id="hint-box">‎</div>
 
     <div class="numpad">
@@ -529,11 +675,11 @@
       <button class="numpad-btn" onclick="selectNum(5)">5</button>
       <button class="numpad-btn" onclick="selectNum(6)">6</button>
       <button class="numpad-btn" onclick="selectNum(7)">7</button>
+      <button class="numpad-btn" onclick="selectNum(8)">8</button>
+      <button class="numpad-btn backspace" onclick="clearSelection()">⌫</button>
       <button class="numpad-btn" onclick="selectNum(9)">9</button>
-      <button class="numpad-btn empty"></button>
-      <button class="numpad-btn zero" onclick="selectNum(0)">0</button>
-      <button class="numpad-btn empty"></button>
-      <button class="numpad-btn empty"></button>
+      <button class="numpad-btn" onclick="selectNum(0)">0</button>
+      <button class="numpad-btn hint-btn" id="hint-btn" onclick="useHint()">💡<span class="hint-badge" id="hint-badge" style="display:none">0</span></button>
     </div>
 
     <button class="submit-btn" id="submit-btn" onclick="submitGuess()" disabled>Submit</button>
@@ -557,6 +703,27 @@
     </div>
   </div>
 
+  <!-- LEADERBOARD SCREEN -->
+  <div class="screen" id="screen-leaderboard">
+    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <div style="width:100%;padding-top:16px;">
+      <div style="text-align:center;margin-bottom:8px;">
+        <div class="game-title" style="font-size:1.4rem;">🏆 Leaderboard</div>
+        <div id="lb-date" style="color:#93c5fd;font-size:0.85rem;font-weight:600;margin-bottom:12px;"></div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;gap:8px;padding:0 16px;margin-bottom:14px;">
+        <button id="tab-today" onclick="switchLbTab('today')" style="flex:1;padding:10px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;">Today</button>
+        <button id="tab-alltime" onclick="switchLbTab('alltime')" style="flex:1;padding:10px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;background:rgba(255,255,255,0.1);color:#93c5fd;">All Time</button>
+      </div>
+
+      <div id="lb-loading" style="text-align:center;color:#93c5fd;padding:40px;font-weight:700;font-family:'Nunito',sans-serif;">Loading scores...</div>
+      <div id="lb-table" style="display:none;width:100%;padding:0 8px;overflow-y:auto;max-height:60dvh;"></div>
+      <div id="lb-my-row" style="display:none;padding:0 8px;margin-top:8px;"></div>
+    </div>
+  </div>
+
   <!-- WIN SCREEN -->
   <div class="screen result-screen" id="screen-win">
     <div class="confetti-container" id="confetti"></div>
@@ -564,6 +731,7 @@
     <div class="result-title">You Got It!</div>
     <p class="result-sub" id="win-sub">You guessed it in <u id="win-tries">1</u> tr<span id="win-try-word">y</span>!</p>
     <button class="result-btn btn-share" onclick="shareScore(true)">🔗 Share Your Score</button>
+    <button class="result-btn" id="lb-btn-win" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;display:none;" onclick="openLeaderboard()">🏆 See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
     <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
   </div>
@@ -574,6 +742,7 @@
     <div class="result-title">You Lost!</div>
     <p class="result-sub">The number was <u id="lose-number" style="color:var(--gold);">?</u></p>
     <button class="result-btn btn-share" onclick="shareScore(false)">🔗 Share Your Score</button>
+    <button class="result-btn" id="lb-btn-lose" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;display:none;" onclick="openLeaderboard()">🏆 See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
     <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
   </div>
@@ -589,6 +758,30 @@
     </div>
   </div>
 
+  <!-- BUY HINTS MODAL -->
+  <div class="modal-overlay" id="buy-hints-modal">
+    <div class="modal">
+      <h2>💡 Get Hints</h2>
+      <p>Use hints to reveal a number range before guessing!</p>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+        <button class="modal-close" style="background:linear-gradient(135deg,#7c3aed,#5b21b6); padding:14px;" onclick="buyHints(1)">1 Hint — $0.99</button>
+        <button class="modal-close" style="background:linear-gradient(135deg,#7c3aed,#5b21b6); padding:14px;" onclick="buyHints(5)">5 Hints — $3.99 <span style="color:#f59e0b; font-size:0.8rem;">BEST VALUE</span></button>
+      </div>
+      <button class="modal-close" style="background:#374151;" onclick="closeBuyHints()">Maybe Later</button>
+    </div>
+  </div>
+
+  <!-- USERNAME MODAL -->
+  <div class="modal-overlay" id="username-modal">
+    <div class="modal">
+      <h2>👋 What's your name?</h2>
+      <p>You'll appear on the Daily Leaderboard!</p>
+      <input id="username-input" type="text" maxlength="16" placeholder="Enter your name..."
+        style="width:100%;padding:14px;border-radius:12px;border:2px solid #3b82f6;background:#1e3a8a;color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;margin-bottom:16px;outline:none;text-align:center;">
+      <button class="modal-close" onclick="saveUsername()" style="width:100%;">Let's Go! 🚀</button>
+    </div>
+  </div>
+
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 </div>
@@ -599,13 +792,395 @@ let secretNumber = 0;
 let currentAttempt = 0;
 let maxAttempts = 3;
 let selectedNum = null;
-let gameMode = 'bot'; // 'bot' | 'friend' | 'daily'
+let gameMode = 'bot';
 let pickerNum = 5;
 let streak = parseInt(localStorage.getItem('bmi3_streak') || '0');
 let bestStreak = parseInt(localStorage.getItem('bmi3_best') || '0');
 let lastPlayed = localStorage.getItem('bmi3_lastPlayed') || '';
 
-// === Stars ===
+// === Username & Leaderboard ===
+let myUsername = localStorage.getItem('bmi3_username') || '';
+let gameStartTime = 0;
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function ensureUsername(callback) {
+  if (myUsername) { callback(); return; }
+  document.getElementById('username-modal').classList.add('active');
+  setTimeout(() => document.getElementById('username-input').focus(), 100);
+  window._usernameCallback = callback;
+}
+
+function saveUsername() {
+  const val = document.getElementById('username-input').value.trim();
+  if (!val) { showToast('Please enter a name!'); return; }
+  myUsername = val;
+  localStorage.setItem('bmi3_username', myUsername);
+  document.getElementById('username-modal').classList.remove('active');
+  if (window._usernameCallback) { window._usernameCallback(); window._usernameCallback = null; }
+}
+
+async function submitDailyScore(tries, won) {
+  if (gameMode !== 'daily' || !myUsername) return;
+  const timeTaken = Math.round((Date.now() - gameStartTime) / 1000);
+  const todayKey = getTodayKey();
+  const existingKey = `lb:${todayKey}:${myUsername}`;
+  try {
+    const existing = await window.storage.get(existingKey, true);
+    if (existing) return;
+  } catch(e) {}
+  try {
+    const score = { name: myUsername, tries: won ? tries : 99, time: timeTaken, date: todayKey };
+    await window.storage.set(existingKey, JSON.stringify(score), true);
+  } catch(e) {}
+}
+
+let currentLbTab = 'today';
+
+function switchLbTab(tab) {
+  currentLbTab = tab;
+  const todayBtn = document.getElementById('tab-today');
+  const alltimeBtn = document.getElementById('tab-alltime');
+  if (tab === 'today') {
+    todayBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+    todayBtn.style.color = '#1a1a1a';
+    alltimeBtn.style.background = 'rgba(255,255,255,0.1)';
+    alltimeBtn.style.color = '#93c5fd';
+  } else {
+    alltimeBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+    alltimeBtn.style.color = '#1a1a1a';
+    todayBtn.style.background = 'rgba(255,255,255,0.1)';
+    todayBtn.style.color = '#93c5fd';
+  }
+  loadLeaderboard(tab);
+}
+
+async function openLeaderboard() {
+  currentLbTab = 'today';
+  showScreen('screen-leaderboard');
+  document.getElementById('lb-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+  // Reset tab styles
+  document.getElementById('tab-today').style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+  document.getElementById('tab-today').style.color = '#1a1a1a';
+  document.getElementById('tab-alltime').style.background = 'rgba(255,255,255,0.1)';
+  document.getElementById('tab-alltime').style.color = '#93c5fd';
+  loadLeaderboard('today');
+}
+
+async function loadLeaderboard(tab) {
+  document.getElementById('lb-loading').style.display = 'block';
+  document.getElementById('lb-table').style.display = 'none';
+  document.getElementById('lb-my-row').style.display = 'none';
+
+  try {
+    const prefix = tab === 'today' ? `lb:${getTodayKey()}:` : `lb:`;
+    const keysResult = await window.storage.list(prefix, true);
+    const keys = keysResult?.keys || [];
+    const scores = [];
+
+    for (const key of keys) {
+      try {
+        const r = await window.storage.get(key, true);
+        if (r) {
+          const s = JSON.parse(r.value);
+          if (tab === 'alltime') {
+            // For all time, aggregate best score per player
+            const existing = scores.find(x => x.name === s.name);
+            if (!existing) {
+              scores.push(s);
+            } else {
+              // Keep best: fewer tries wins, then faster time
+              if (s.tries < existing.tries || (s.tries === existing.tries && s.time < existing.time)) {
+                Object.assign(existing, s);
+              }
+            }
+          } else {
+            scores.push(s);
+          }
+        }
+      } catch(e) {}
+    }
+
+    scores.sort((a,b) => a.tries - b.tries || a.time - b.time);
+    document.getElementById('lb-loading').style.display = 'none';
+    document.getElementById('lb-table').style.display = 'block';
+
+    const medals = ['🥇','🥈','🥉'];
+    const top10 = scores.slice(0, 10);
+    const myRank = myUsername ? scores.findIndex(s => s.name === myUsername) + 1 : 0;
+
+    let html = '';
+    if (scores.length === 0) {
+      html = `<div style="text-align:center;color:#93c5fd;padding:32px;font-weight:700;font-family:'Nunito',sans-serif;">No scores yet!<br><br>${tab === 'today' ? 'Be the first to play Daily Challenge today! 🚀' : 'Play Daily Challenge to appear here!'}</div>`;
+    } else {
+      top10.forEach((s, i) => {
+        const rank = i + 1;
+        const isMe = s.name === myUsername;
+        const rankClass = rank <= 3 ? `top${rank}` : '';
+        const rankLabel = rank <= 3 ? medals[rank-1] : `#${rank}`;
+        const triesLabel = s.tries === 99 ? '✗ Lost' : `${s.tries} tr${s.tries===1?'y':'ies'}`;
+        const timeLabel = s.tries === 99 ? '' : `${s.time}s`;
+        html += `<div class="lb-row ${rankClass} ${isMe?'me':''}">
+          <div class="lb-rank">${rankLabel}</div>
+          <div class="lb-name">${s.name}${isMe?' 👈':''}</div>
+          <div class="lb-tries">${triesLabel}</div>
+          <div class="lb-time">${timeLabel}</div>
+        </div>`;
+      });
+    }
+    document.getElementById('lb-table').innerHTML = html;
+
+    if (myRank > 10 && myUsername) {
+      const me = scores[myRank-1];
+      const triesLabel = me.tries === 99 ? '✗ Lost' : `${me.tries} tr${me.tries===1?'y':'ies'}`;
+      document.getElementById('lb-my-row').style.display = 'block';
+      document.getElementById('lb-my-row').innerHTML = `
+        <div class="lb-separator">• • •</div>
+        <div class="lb-row me">
+          <div class="lb-rank">#${myRank}</div>
+          <div class="lb-name">${me.name} 👈</div>
+          <div class="lb-tries">${triesLabel}</div>
+          <div class="lb-time">${me.time}s</div>
+        </div>`;
+    }
+  } catch(e) {
+    document.getElementById('lb-loading').textContent = 'Could not load scores. Try again!';
+  }
+}
+
+// === Sound Engine ===
+let audioCtx = null;
+let soundEnabled = true;
+let bgmGain = null;
+let bgmPlaying = false;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, type, duration, vol=0.3, delay=0) {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+  gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+  osc.start(ctx.currentTime + delay);
+  osc.stop(ctx.currentTime + delay + duration);
+}
+
+function sfxClick() { playTone(440, 'sine', 0.08, 0.15); }
+function sfxSelect() { playTone(660, 'sine', 0.1, 0.2); }
+function sfxWrong() {
+  playTone(200, 'sawtooth', 0.15, 0.2);
+  playTone(150, 'sawtooth', 0.2, 0.2, 0.15);
+}
+function sfxWin() {
+  // Fanfare melody
+  [523,659,784,1047].forEach((f,i) => playTone(f, 'sine', 0.3, 0.3, i*0.1));
+  // Crowd applause simulation — bursts of noise
+  setTimeout(() => sfxApplause(), 500);
+}
+
+function sfxApplause() {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  // White noise burst = applause
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => {
+      const bufSize = ctx.sampleRate * 0.15;
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let j = 0; j < bufSize; j++) data[j] = (Math.random() * 2 - 1) * 0.4;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 2000 + Math.random() * 1000;
+      src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+      src.start(); src.stop(ctx.currentTime + 0.18);
+    }, i * 120);
+  }
+}
+
+function sfxLose() {
+  // Sad trombone
+  [300, 250, 200, 150].forEach((f,i) => playTone(f, 'sawtooth', 0.3, 0.25, i*0.15));
+  // Crowd awww — low groan with noise
+  setTimeout(() => sfxCrowdGroan(), 400);
+}
+
+function sfxCrowdGroan() {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  // Low rumble crowd groan
+  for (let i = 0; i < 4; i++) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180 + i * 15, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(140 + i * 10, ctx.currentTime + 0.8);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 0.9);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.9);
+  }
+  // Noise layer
+  const bufSize = ctx.sampleRate * 0.6;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let j = 0; j < bufSize; j++) data[j] = (Math.random() * 2 - 1) * 0.15;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const gain2 = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 800;
+  src.connect(filter); filter.connect(gain2); gain2.connect(ctx.destination);
+  gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+  gain2.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 0.6);
+  src.start(); src.stop(ctx.currentTime + 0.6);
+}
+function sfxTick() { playTone(800, 'square', 0.04, 0.05); }
+function sfxUrgent() { playTone(1000, 'square', 0.06, 0.1); }
+
+function startBGM() {
+  if (!soundEnabled || bgmPlaying) return;
+  const ctx = getAudioCtx();
+  bgmGain = ctx.createGain();
+  bgmGain.gain.setValueAtTime(0.06, ctx.currentTime);
+  bgmGain.connect(ctx.destination);
+  bgmPlaying = true;
+
+  const notes = [261, 293, 329, 349, 392, 440, 493, 523];
+  const pattern = [0,2,4,2,3,5,4,2,0,2,4,7,6,4,3,1];
+  let step = 0;
+
+  function playBeat() {
+    if (!bgmPlaying || !soundEnabled) return;
+    const osc = ctx.createOscillator();
+    osc.connect(bgmGain);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(notes[pattern[step % pattern.length]], ctx.currentTime);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.18);
+    step++;
+    setTimeout(playBeat, 220);
+  }
+  playBeat();
+}
+
+function stopBGM() {
+  bgmPlaying = false;
+  if (bgmGain) { bgmGain.gain.setValueAtTime(0, getAudioCtx().currentTime); }
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+  if (soundEnabled) startBGM(); else stopBGM();
+}
+
+// === Timer ===
+let timerInterval = null;
+let timeLeft = 15;
+const TIMER_DURATION = 15;
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = TIMER_DURATION;
+  updateTimerUI();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft <= 5) sfxUrgent();
+    else if (timeLeft <= 10) sfxTick();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeExpired();
+    }
+  }, 1000);
+}
+
+function stopTimer() { clearInterval(timerInterval); }
+
+function updateTimerUI() {
+  const bar = document.getElementById('timer-bar');
+  const num = document.getElementById('timer-num');
+  if (!bar || !num) return;
+  const pct = (timeLeft / TIMER_DURATION) * 100;
+  bar.style.width = pct + '%';
+  num.textContent = timeLeft;
+  bar.className = 'timer-bar' + (timeLeft <= 5 ? ' danger' : timeLeft <= 9 ? ' warning' : '');
+  num.className = 'timer-num' + (timeLeft <= 5 ? ' danger' : '');
+}
+
+function timeExpired() {
+  sfxWrong();
+  const dot = document.getElementById(`dot-${currentAttempt}`);
+  dot.classList.add('wrong');
+  currentAttempt++;
+  if (currentAttempt >= maxAttempts) {
+    setTimeout(() => showLose(), 400);
+    return;
+  }
+  const hint = document.getElementById('hint-box');
+  hint.innerHTML = '⏱️ Time\'s up! Keep going...';
+  hint.className = 'hint-box hint-higher';
+  selectedNum = null;
+  document.querySelectorAll('.numpad-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('submit-btn').disabled = true;
+  startTimer();
+}
+
+function goHome() {
+  stopTimer();
+  stopBGM();
+  showScreen('screen-home');
+}
+
+function startCountdown(callback) {
+  const overlay = document.getElementById('countdown-overlay');
+  const numEl = document.getElementById('countdown-number');
+  const steps = ['3', '2', '1', 'Go!'];
+  let i = 0;
+
+  overlay.classList.add('active');
+
+  function showStep() {
+    numEl.className = 'countdown-number' + (steps[i] === 'Go!' ? ' go' : i === 0 ? ' gold' : '');
+    numEl.textContent = steps[i];
+    // Re-trigger animation
+    numEl.style.animation = 'none';
+    void numEl.offsetWidth;
+    numEl.style.animation = '';
+
+    // Play tick sound
+    if (steps[i] !== 'Go!') playTone(660 - i * 80, 'sine', 0.15, 0.4);
+    else playTone(880, 'sine', 0.2, 0.5);
+
+    i++;
+    if (i < steps.length) {
+      setTimeout(showStep, 900);
+    } else {
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        callback();
+      }, 900);
+    }
+  }
+  showStep();
+}
 (function createStars() {
   const container = document.getElementById('stars');
   for (let i = 0; i < 30; i++) {
@@ -632,16 +1207,18 @@ function startBotGame() {
 }
 
 function startDailyChallenge() {
-  gameMode = 'daily';
-  // Seed with today's date
-  const today = new Date().toDateString();
-  let seed = 0;
-  for (const c of today) seed += c.charCodeAt(0);
-  secretNumber = seed % 10;
-  const label = document.getElementById('game-mode-label');
-  label.style.display = 'block';
-  label.textContent = '📅 Daily Challenge';
-  initGame();
+  ensureUsername(() => {
+    gameMode = 'daily';
+    const today = new Date().toDateString();
+    let seed = 0;
+    for (const c of today) seed += c.charCodeAt(0);
+    secretNumber = seed % 10;
+    const label = document.getElementById('game-mode-label');
+    label.style.display = 'block';
+    label.textContent = '📅 Daily Challenge';
+    gameStartTime = Date.now();
+    initGame();
+  });
 }
 
 function startFriendChallenge() {
@@ -669,13 +1246,78 @@ function initGame() {
   // Reset numpad
   document.querySelectorAll('.numpad-btn:not(.empty)').forEach(b => b.classList.remove('selected'));
   document.getElementById('submit-btn').disabled = true;
+  hintUsedThisGame = false;
+  updateHintBtn();
   showScreen('screen-game');
+  setTimeout(() => {
+    startCountdown(() => { startBGM(); startTimer(); });
+  }, 100);
 }
 
 // === Number selection ===
+let hintsOwned = parseInt(localStorage.getItem('bmi3_hints') || '0');
+let hintUsedThisGame = false;
+
+function updateHintBtn() {
+  const btn = document.getElementById('hint-btn');
+  const badge = document.getElementById('hint-badge');
+  if (hintsOwned > 0) {
+    btn.classList.add('has-hints');
+    badge.style.display = 'flex';
+    badge.textContent = hintsOwned;
+  } else {
+    btn.classList.remove('has-hints');
+    badge.style.display = 'none';
+  }
+}
+
+function clearSelection() {
+  selectedNum = null;
+  document.querySelectorAll('.numpad-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('submit-btn').disabled = true;
+}
+
+function useHint() {
+  if (hintsOwned <= 0) {
+    showBuyHints();
+    return;
+  }
+  if (hintUsedThisGame) {
+    showToast('Already used a hint this game!');
+    return;
+  }
+  // Give a range hint
+  let low = Math.max(0, secretNumber - 2);
+  let high = Math.min(9, secretNumber + 2);
+  // Make sure secret is inside range but don't make it too obvious
+  const hint = document.getElementById('hint-box');
+  hint.innerHTML = `💡 The number is between <strong style="color:white">${low}</strong> and <strong style="color:white">${high}</strong>`;
+  hint.className = 'hint-box hint-higher';
+  hintUsedThisGame = true;
+  hintsOwned--;
+  localStorage.setItem('bmi3_hints', hintsOwned);
+  updateHintBtn();
+}
+
+function showBuyHints() {
+  document.getElementById('buy-hints-modal').classList.add('active');
+}
+function closeBuyHints() {
+  document.getElementById('buy-hints-modal').classList.remove('active');
+}
+function buyHints(amount) {
+  // Simulate purchase — in production connect to Play Billing
+  hintsOwned += amount;
+  localStorage.setItem('bmi3_hints', hintsOwned);
+  updateHintBtn();
+  closeBuyHints();
+  showToast(`${amount} hint${amount > 1 ? 's' : ''} added! 💡`);
+}
+
 function selectNum(n) {
+  sfxSelect();
   selectedNum = n;
-  document.querySelectorAll('.numpad-btn:not(.empty)').forEach(b => {
+  document.querySelectorAll('.numpad-btn').forEach(b => {
     b.classList.toggle('selected', parseInt(b.textContent) === n);
   });
   document.getElementById('submit-btn').disabled = false;
@@ -689,6 +1331,8 @@ function submitGuess() {
   dot.classList.add('used');
 
   if (selectedNum === secretNumber) {
+    stopTimer();
+    sfxWin();
     dot.classList.remove('used');
     dot.classList.add('correct');
     // Update streak
@@ -708,9 +1352,11 @@ function submitGuess() {
 
   dot.classList.remove('used');
   dot.classList.add('wrong');
+  sfxWrong();
   currentAttempt++;
 
   if (currentAttempt >= maxAttempts) {
+    stopTimer();
     setTimeout(() => showLose(), 300);
     return;
   }
@@ -735,17 +1381,28 @@ function submitGuess() {
   selectedNum = null;
   document.querySelectorAll('.numpad-btn:not(.empty)').forEach(b => b.classList.remove('selected'));
   document.getElementById('submit-btn').disabled = true;
+  startTimer();
 }
 
 function showWin(tries) {
+  stopBGM();
+  sfxWin();
   document.getElementById('win-tries').textContent = tries;
   document.getElementById('win-try-word').textContent = tries === 1 ? 'y' : 'ies';
+  const isDaily = gameMode === 'daily';
+  document.getElementById('lb-btn-win').style.display = isDaily ? 'block' : 'none';
+  if (isDaily) submitDailyScore(tries, true);
   spawnConfetti();
   showScreen('screen-win');
 }
 
 function showLose() {
+  stopBGM();
+  sfxLose();
   document.getElementById('lose-number').textContent = secretNumber;
+  const isDaily = gameMode === 'daily';
+  document.getElementById('lb-btn-lose').style.display = isDaily ? 'block' : 'none';
+  if (isDaily) submitDailyScore(3, false);
   showScreen('screen-lose');
 }
 
@@ -814,9 +1471,20 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// Set daily challenge calendar icon
+const _now = new Date();
+document.getElementById('cal-month').textContent = _now.toLocaleDateString('en-US', { month:'short' }).toUpperCase();
+document.getElementById('cal-day').textContent = _now.getDate();
+
 // Close modal on overlay click
 document.getElementById('streak-modal').addEventListener('click', function(e) {
   if (e.target === this) closeStreak();
+});
+document.getElementById('username-modal').addEventListener('click', function(e) {
+  if (e.target === this) saveUsername();
+});
+document.getElementById('username-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveUsername();
 });
 </script>
 </body>
