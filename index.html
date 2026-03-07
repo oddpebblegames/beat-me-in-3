@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Beat Me in 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --navy: #0d2060;
+    --blue: #1a3fa8;
+    --blue-mid: #1e4fc2;
+    --blue-light: #2563eb;
+    --gold: #f59e0b;
+    --gold-dark: #d97706;
+    --green: #22c55e;
+    --green-dark: #16a34a;
+    --white: #ffffff;
+    --hint-orange: #fb923c;
+    --hint-blue: #60a5fa;
+    --red: #ef4444;
+  }
+
+  html, body {
+    height: 100%;
+    background: #0a1a5c;
+    font-family: 'Nunito Sans', sans-serif;
+    overflow: hidden;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    background: linear-gradient(160deg, #1a3fa8 0%, #0d2060 60%, #091545 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Decorative stars */
+  .stars {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: 0.08; } to { opacity: 0.25; } }
+
+  /* ---- SCREENS ---- */
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100dvh;
+    padding: 40px 24px 32px;
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 0.3s ease;
+  }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---- HOME SCREEN ---- */
+  .home-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: white;
+    text-align: center;
+    margin-bottom: 8px;
+    margin-top: 20px;
+    line-height: 1.1;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+  .home-title span { color: var(--gold); }
+  .home-subtitle {
+    color: #93c5fd;
+    font-size: 0.95rem;
+    margin-bottom: 48px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .menu-btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 18px 24px;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    transition: transform 0.12s, box-shadow 0.12s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .menu-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  .btn-bot { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1a1a; }
+  .btn-friend { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+  .btn-daily { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color: white; border: 2px solid #60a5fa; }
+  .btn-streak {
+    background: transparent; color: #93c5fd;
+    font-size: 0.95rem; font-weight: 700;
+    border: none; cursor: pointer;
+    padding: 8px; margin-top: 4px;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .bot-icon { font-size: 1.6rem; }
+
+  /* ---- GAMEPLAY ---- */
+  .game-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .game-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: white;
+  }
+  .game-title span { color: var(--gold); }
+
+  .guess-prompt {
+    color: #93c5fd;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* Attempt dots */
+  .attempts-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    justify-content: center;
+  }
+  .dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid #60a5fa;
+    background: transparent;
+    transition: all 0.3s;
+  }
+  .dot.used { background: #60a5fa; border-color: #60a5fa; }
+  .dot.wrong { background: var(--red); border-color: var(--red); }
+  .dot.correct { background: var(--green); border-color: var(--green); }
+
+  /* Hint */
+  .hint-box {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px 24px;
+    margin-bottom: 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    min-width: 180px;
+    text-align: center;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s;
+  }
+  .hint-higher { color: var(--hint-orange); }
+  .hint-lower { color: var(--hint-blue); }
+  .hint-empty { color: transparent; }
+
+  /* Number pad */
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 20px;
+  }
+  .numpad-btn {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(145deg, #2b57d4, #1a3fa8);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #0d2060, 0 6px 12px rgba(0,0,0,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .numpad-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #0d2060, 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .numpad-btn.selected {
+    background: linear-gradient(145deg, #60a5fa, #2563eb);
+    box-shadow: 0 4px 0 #1e40af, 0 0 20px rgba(96,165,250,0.5), 0 6px 12px rgba(0,0,0,0.3);
+  }
+  .numpad-btn.empty { background: transparent; box-shadow: none; pointer-events: none; }
+  .numpad-btn.zero { grid-column: 2; }
+
+  .submit-btn {
+    width: 100%;
+    max-width: 320px;
+    padding: 18px;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #14532d, 0 6px 16px rgba(34,197,94,0.35);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .submit-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #14532d, 0 2px 8px rgba(34,197,94,0.35);
+  }
+  .submit-btn:disabled {
+    background: #374151;
+    box-shadow: 0 4px 0 #1f2937;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* ---- FRIEND CHALLENGE SCREEN ---- */
+  .set-number-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .set-number-sub {
+    color: #93c5fd;
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .number-picker {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 40px;
+  }
+  .picker-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.12);
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    transition: background 0.15s;
+  }
+  .picker-btn:active { background: rgba(255,255,255,0.25); }
+  .picker-number {
+    font-family: 'Nunito', sans-serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: white;
+    min-width: 80px;
+    text-align: center;
+    text-shadow: 0 0 30px rgba(255,255,255,0.3);
+  }
+
+  .create-challenge-btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 18px;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #14532d, 0 6px 16px rgba(34,197,94,0.35);
+    margin-bottom: 12px;
+    transition: transform 0.1s;
+  }
+  .create-challenge-btn:active { transform: scale(0.97); }
+  .share-hint { color: #93c5fd; font-size: 0.85rem; font-weight: 600; }
+
+  /* ---- WIN / LOSE SCREENS ---- */
+  .result-screen {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .confetti-container {
+    position: fixed; inset: 0; pointer-events: none; z-index: 10;
+    overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 10px; height: 14px;
+    top: -20px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  .result-icon { font-size: 5rem; margin-bottom: 16px; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+  .result-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    animation: pop 0.4s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  .result-sub {
+    color: #93c5fd;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+  }
+  .result-sub u { color: white; text-decoration: underline; text-decoration-color: var(--gold); }
+
+  .result-btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 18px;
+    border-radius: 16px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: transform 0.1s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+  .result-btn:active { transform: scale(0.97); }
+  .btn-share { background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%); color: white; }
+  .btn-again { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+  .btn-home-small { background: transparent; color: #93c5fd; font-size: 0.95rem; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; padding: 8px; }
+
+  /* Streak modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: linear-gradient(145deg, #1a3fa8, #0d2060);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 32px 24px;
+    width: 90%;
+    max-width: 340px;
+    text-align: center;
+    animation: fadeIn 0.25s ease;
+  }
+  .modal h2 { font-family: 'Nunito', sans-serif; font-size: 1.6rem; font-weight: 900; color: white; margin-bottom: 8px; }
+  .modal p { color: #93c5fd; font-size: 1rem; font-weight: 600; margin-bottom: 24px; }
+  .streak-number { font-family: 'Nunito', sans-serif; font-size: 4rem; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+  .modal-close {
+    padding: 14px 32px;
+    border-radius: 12px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  /* Share toast */
+  .toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1e293b;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 32px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    z-index: 200;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Daily badge */
+  .daily-badge {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #1a1a1a;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    font-family: 'Nunito', sans-serif;
+    margin-bottom: 24px;
+  }
+
+  .back-btn {
+    position: absolute;
+    top: 16px; left: 16px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5;
+  }
+
+  .shake { animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-6px)}
+    80%{transform:translateX(6px)}
+  }
+
+  /* Challenge play mode label */
+  .challenge-label {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 4px 16px;
+    color: #93c5fd;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- Stars background -->
+  <div class="stars" id="stars"></div>
+
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="screen-home">
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
+      <div style="font-size:4rem; margin-bottom:8px;">🤖</div>
+      <h1 class="home-title">Beat Me in <span>3</span></h1>
+      <p class="home-subtitle">Guess the number in 3 tries or less</p>
+
+      <button class="menu-btn btn-bot" onclick="startBotGame()">
+        <span class="bot-icon">🤖</span> Play vs Bot
+      </button>
+      <button class="menu-btn btn-friend" onclick="showScreen('screen-friend-set')">
+        <span>👥</span> Challenge a Friend
+      </button>
+      <button class="menu-btn btn-daily" onclick="startDailyChallenge()">
+        <span>📅</span> Daily Challenge
+      </button>
+      <button class="btn-streak" onclick="showStreak()">View Streak 🔥</button>
+    </div>
+  </div>
+
+  <!-- GAMEPLAY SCREEN (vs Bot) -->
+  <div class="screen" id="screen-game">
+    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <div class="game-header">
+      <div class="game-title">Beat Me in <span>3</span></div>
+    </div>
+    <div id="game-mode-label" class="challenge-label" style="display:none;"></div>
+    <p class="guess-prompt">Guess the number (0–9)</p>
+
+    <div class="attempts-row" id="attempts-row">
+      <div class="dot" id="dot-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+    </div>
+
+    <div class="hint-box hint-empty" id="hint-box">‎</div>
+
+    <div class="numpad">
+      <button class="numpad-btn" onclick="selectNum(1)">1</button>
+      <button class="numpad-btn" onclick="selectNum(2)">2</button>
+      <button class="numpad-btn" onclick="selectNum(3)">3</button>
+      <button class="numpad-btn" onclick="selectNum(4)">4</button>
+      <button class="numpad-btn" onclick="selectNum(5)">5</button>
+      <button class="numpad-btn" onclick="selectNum(6)">6</button>
+      <button class="numpad-btn" onclick="selectNum(7)">7</button>
+      <button class="numpad-btn" onclick="selectNum(9)">9</button>
+      <button class="numpad-btn empty"></button>
+      <button class="numpad-btn zero" onclick="selectNum(0)">0</button>
+      <button class="numpad-btn empty"></button>
+      <button class="numpad-btn empty"></button>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitGuess()" disabled>Submit</button>
+  </div>
+
+  <!-- FRIEND SET NUMBER SCREEN -->
+  <div class="screen" id="screen-friend-set">
+    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
+      <p class="set-number-title">Set a number (0–9)</p>
+      <p class="set-number-sub">Your friend will try to guess it in 3 tries</p>
+
+      <div class="number-picker">
+        <button class="picker-btn" onclick="changePickerNum(-1)">‹</button>
+        <div class="picker-number" id="picker-display">5</div>
+        <button class="picker-btn" onclick="changePickerNum(1)">›</button>
+      </div>
+
+      <button class="create-challenge-btn" onclick="startFriendChallenge()">Create Challenge</button>
+      <p class="share-hint">Share the link with your friend!</p>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div class="screen result-screen" id="screen-win">
+    <div class="confetti-container" id="confetti"></div>
+    <div class="result-icon">🎉</div>
+    <div class="result-title">You Got It!</div>
+    <p class="result-sub" id="win-sub">You guessed it in <u id="win-tries">1</u> tr<span id="win-try-word">y</span>!</p>
+    <button class="result-btn btn-share" onclick="shareScore(true)">🔗 Share Your Score</button>
+    <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
+    <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
+  </div>
+
+  <!-- LOSE SCREEN -->
+  <div class="screen result-screen" id="screen-lose">
+    <div class="result-icon">😅</div>
+    <div class="result-title">You Lost!</div>
+    <p class="result-sub">The number was <u id="lose-number" style="color:var(--gold);">?</u></p>
+    <button class="result-btn btn-share" onclick="shareScore(false)">🔗 Share Your Score</button>
+    <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
+    <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
+  </div>
+
+  <!-- STREAK MODAL -->
+  <div class="modal-overlay" id="streak-modal">
+    <div class="modal">
+      <h2>🔥 Your Streak</h2>
+      <div class="streak-number" id="streak-display">0</div>
+      <p>days in a row</p>
+      <p style="margin-bottom:24px; font-size:0.85rem;">Best: <span id="best-streak" style="color:var(--gold); font-weight:800;">0</span> days</p>
+      <button class="modal-close" onclick="closeStreak()">Close</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// === State ===
+let secretNumber = 0;
+let currentAttempt = 0;
+let maxAttempts = 3;
+let selectedNum = null;
+let gameMode = 'bot'; // 'bot' | 'friend' | 'daily'
+let pickerNum = 5;
+let streak = parseInt(localStorage.getItem('bmi3_streak') || '0');
+let bestStreak = parseInt(localStorage.getItem('bmi3_best') || '0');
+let lastPlayed = localStorage.getItem('bmi3_lastPlayed') || '';
+
+// === Stars ===
+(function createStars() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 30; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 3 + 1;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s`;
+    container.appendChild(s);
+  }
+})();
+
+// === Screen navigation ===
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// === Game Start ===
+function startBotGame() {
+  gameMode = 'bot';
+  secretNumber = Math.floor(Math.random() * 10);
+  document.getElementById('game-mode-label').style.display = 'none';
+  initGame();
+}
+
+function startDailyChallenge() {
+  gameMode = 'daily';
+  // Seed with today's date
+  const today = new Date().toDateString();
+  let seed = 0;
+  for (const c of today) seed += c.charCodeAt(0);
+  secretNumber = seed % 10;
+  const label = document.getElementById('game-mode-label');
+  label.style.display = 'block';
+  label.textContent = '📅 Daily Challenge';
+  initGame();
+}
+
+function startFriendChallenge() {
+  gameMode = 'friend';
+  secretNumber = pickerNum;
+  const label = document.getElementById('game-mode-label');
+  label.style.display = 'block';
+  label.textContent = '👥 Friend Challenge';
+  initGame();
+  showToast('Challenge created! Pass the phone 📱');
+}
+
+function initGame() {
+  currentAttempt = 0;
+  selectedNum = null;
+  // Reset dots
+  for (let i = 0; i < 3; i++) {
+    const dot = document.getElementById(`dot-${i}`);
+    dot.className = 'dot';
+  }
+  // Reset hint
+  const hint = document.getElementById('hint-box');
+  hint.textContent = '‎';
+  hint.className = 'hint-box hint-empty';
+  // Reset numpad
+  document.querySelectorAll('.numpad-btn:not(.empty)').forEach(b => b.classList.remove('selected'));
+  document.getElementById('submit-btn').disabled = true;
+  showScreen('screen-game');
+}
+
+// === Number selection ===
+function selectNum(n) {
+  selectedNum = n;
+  document.querySelectorAll('.numpad-btn:not(.empty)').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.textContent) === n);
+  });
+  document.getElementById('submit-btn').disabled = false;
+}
+
+// === Submit guess ===
+function submitGuess() {
+  if (selectedNum === null) return;
+
+  const dot = document.getElementById(`dot-${currentAttempt}`);
+  dot.classList.add('used');
+
+  if (selectedNum === secretNumber) {
+    dot.classList.remove('used');
+    dot.classList.add('correct');
+    // Update streak
+    const today = new Date().toDateString();
+    if (lastPlayed !== today) {
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+      streak = (lastPlayed === yesterday) ? streak + 1 : 1;
+      if (streak > bestStreak) bestStreak = streak;
+      localStorage.setItem('bmi3_streak', streak);
+      localStorage.setItem('bmi3_best', bestStreak);
+      localStorage.setItem('bmi3_lastPlayed', today);
+      lastPlayed = today;
+    }
+    setTimeout(() => showWin(currentAttempt + 1), 300);
+    return;
+  }
+
+  dot.classList.remove('used');
+  dot.classList.add('wrong');
+  currentAttempt++;
+
+  if (currentAttempt >= maxAttempts) {
+    setTimeout(() => showLose(), 300);
+    return;
+  }
+
+  // Show hint
+  const hint = document.getElementById('hint-box');
+  const gameEl = document.getElementById('screen-game');
+  if (selectedNum < secretNumber) {
+    hint.innerHTML = 'Hint: Higher <span style="font-size:1.3rem">⬆️</span>';
+    hint.className = 'hint-box hint-higher';
+  } else {
+    hint.innerHTML = 'Hint: Lower <span style="font-size:1.3rem">⬇️</span>';
+    hint.className = 'hint-box hint-lower';
+  }
+
+  // Shake hint
+  hint.classList.remove('shake');
+  void hint.offsetWidth;
+  hint.classList.add('shake');
+
+  // Reset selection
+  selectedNum = null;
+  document.querySelectorAll('.numpad-btn:not(.empty)').forEach(b => b.classList.remove('selected'));
+  document.getElementById('submit-btn').disabled = true;
+}
+
+function showWin(tries) {
+  document.getElementById('win-tries').textContent = tries;
+  document.getElementById('win-try-word').textContent = tries === 1 ? 'y' : 'ies';
+  spawnConfetti();
+  showScreen('screen-win');
+}
+
+function showLose() {
+  document.getElementById('lose-number').textContent = secretNumber;
+  showScreen('screen-lose');
+}
+
+// === Confetti ===
+function spawnConfetti() {
+  const container = document.getElementById('confetti');
+  container.innerHTML = '';
+  const colors = ['#f59e0b','#22c55e','#3b82f6','#ef4444','#a855f7','#ec4899','#ffffff'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${1.2+Math.random()*1.8}s;
+      animation-delay:${Math.random()*0.8}s;
+      transform:rotate(${Math.random()*360}deg);
+      width:${6+Math.random()*8}px;
+      height:${8+Math.random()*10}px;
+    `;
+    container.appendChild(el);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 4000);
+}
+
+// === Friend picker ===
+function changePickerNum(dir) {
+  pickerNum = (pickerNum + dir + 10) % 10;
+  document.getElementById('picker-display').textContent = pickerNum;
+}
+
+// === Streak ===
+function showStreak() {
+  document.getElementById('streak-display').textContent = streak;
+  document.getElementById('best-streak').textContent = bestStreak;
+  document.getElementById('streak-modal').classList.add('active');
+}
+function closeStreak() {
+  document.getElementById('streak-modal').classList.remove('active');
+}
+
+// === Share ===
+function shareScore(won) {
+  const tries = won ? document.getElementById('win-tries').textContent : '3';
+  const emoji = won ? Array(parseInt(tries)).fill('🟥').map((_,i) => i === parseInt(tries)-1 ? '🟩' : '🟥').join('') : '🟥🟥🟥';
+  const text = won
+    ? `I guessed it in ${tries}/3 tries on Beat Me in 3! ${emoji}\nCan you beat me?`
+    : `I couldn't guess it in Beat Me in 3! ${emoji}\nThe number was ${secretNumber}. Can you do better?`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'Beat Me in 3', text }).catch(() => copyToClipboard(text));
+  } else {
+    copyToClipboard(text);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard! 📋')).catch(() => showToast('Share: ' + text.slice(0, 40) + '...'));
+}
+
+// === Toast ===
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Close modal on overlay click
+document.getElementById('streak-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeStreak();
+});
+</script>
+</body>
+</html>
