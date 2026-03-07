@@ -10,14 +10,16 @@
   "theme_color": "#1a3fa8",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192x192.png",
+      "src": "/beat-me-in-3/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://via.placeholder.com/512x512.png",
+      "src": "/beat-me-in-3/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
