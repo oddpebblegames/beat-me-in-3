@@ -801,6 +801,27 @@ let lastPlayed = localStorage.getItem('bmi3_lastPlayed') || '';
 // === Username & Leaderboard ===
 let myUsername = localStorage.getItem('bmi3_username') || '';
 let gameStartTime = 0;
+let db = null;
+
+// === Firebase Init ===
+(async function initFirebase() {
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
+    const { getFirestore, collection, doc, setDoc, getDocs, query, where, orderBy, getDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+    const firebaseConfig = {
+      apiKey: "AIzaSyBILWztgCj6ni_SlPTAYUA86-Bi3jpQRq4",
+      authDomain: "beat-me-in-3.firebaseapp.com",
+      projectId: "beat-me-in-3",
+      storageBucket: "beat-me-in-3.firebasestorage.app",
+      messagingSenderId: "87457844217",
+      appId: "1:87457844217:web:794a63a3ce338c64d04b28"
+    };
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    window._fb = { collection, doc, setDoc, getDocs, query, where, orderBy, getDoc };
+    console.log('Firebase ready!');
+  } catch(e) { console.error('Firebase init failed:', e); }
+})();
 
 function getTodayKey() {
   const d = new Date();
@@ -824,18 +845,17 @@ function saveUsername() {
 }
 
 async function submitDailyScore(tries, won) {
-  if (gameMode !== 'daily' || !myUsername) return;
+  if (gameMode !== 'daily' || !myUsername || !db) return;
   const timeTaken = Math.round((Date.now() - gameStartTime) / 1000);
   const todayKey = getTodayKey();
-  const existingKey = `lb:${todayKey}:${myUsername}`;
+  const { doc, setDoc, getDoc } = window._fb;
+  const scoreId = `${todayKey}_${myUsername.replace(/\s+/g,'_')}`;
+  const ref = doc(db, 'scores', scoreId);
   try {
-    const existing = await window.storage.get(existingKey, true);
-    if (existing) return;
-  } catch(e) {}
-  try {
-    const score = { name: myUsername, tries: won ? tries : 99, time: timeTaken, date: todayKey };
-    await window.storage.set(existingKey, JSON.stringify(score), true);
-  } catch(e) {}
+    const existing = await getDoc(ref);
+    if (existing.exists()) return;
+    await setDoc(ref, { name: myUsername, tries: won ? tries : 99, time: timeTaken, date: todayKey, timestamp: Date.now() });
+  } catch(e) { console.error('Score submit error:', e); }
 }
 
 let currentLbTab = 'today';
@@ -845,15 +865,11 @@ function switchLbTab(tab) {
   const todayBtn = document.getElementById('tab-today');
   const alltimeBtn = document.getElementById('tab-alltime');
   if (tab === 'today') {
-    todayBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
-    todayBtn.style.color = '#1a1a1a';
-    alltimeBtn.style.background = 'rgba(255,255,255,0.1)';
-    alltimeBtn.style.color = '#93c5fd';
+    todayBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)'; todayBtn.style.color = '#1a1a1a';
+    alltimeBtn.style.background = 'rgba(255,255,255,0.1)'; alltimeBtn.style.color = '#93c5fd';
   } else {
-    alltimeBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
-    alltimeBtn.style.color = '#1a1a1a';
-    todayBtn.style.background = 'rgba(255,255,255,0.1)';
-    todayBtn.style.color = '#93c5fd';
+    alltimeBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)'; alltimeBtn.style.color = '#1a1a1a';
+    todayBtn.style.background = 'rgba(255,255,255,0.1)'; todayBtn.style.color = '#93c5fd';
   }
   loadLeaderboard(tab);
 }
@@ -862,7 +878,6 @@ async function openLeaderboard() {
   currentLbTab = 'today';
   showScreen('screen-leaderboard');
   document.getElementById('lb-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
-  // Reset tab styles
   document.getElementById('tab-today').style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
   document.getElementById('tab-today').style.color = '#1a1a1a';
   document.getElementById('tab-alltime').style.background = 'rgba(255,255,255,0.1)';
@@ -872,39 +887,35 @@ async function openLeaderboard() {
 
 async function loadLeaderboard(tab) {
   document.getElementById('lb-loading').style.display = 'block';
+  document.getElementById('lb-loading').textContent = 'Loading scores...';
   document.getElementById('lb-table').style.display = 'none';
   document.getElementById('lb-my-row').style.display = 'none';
 
-  try {
-    const prefix = tab === 'today' ? `lb:${getTodayKey()}:` : `lb:`;
-    const keysResult = await window.storage.list(prefix, true);
-    const keys = keysResult?.keys || [];
-    const scores = [];
+  if (!db) {
+    document.getElementById('lb-loading').textContent = 'Connecting... please wait';
+    setTimeout(() => loadLeaderboard(tab), 1500);
+    return;
+  }
 
-    for (const key of keys) {
-      try {
-        const r = await window.storage.get(key, true);
-        if (r) {
-          const s = JSON.parse(r.value);
-          if (tab === 'alltime') {
-            // For all time, aggregate best score per player
-            const existing = scores.find(x => x.name === s.name);
-            if (!existing) {
-              scores.push(s);
-            } else {
-              // Keep best: fewer tries wins, then faster time
-              if (s.tries < existing.tries || (s.tries === existing.tries && s.time < existing.time)) {
-                Object.assign(existing, s);
-              }
-            }
-          } else {
-            scores.push(s);
-          }
-        }
-      } catch(e) {}
+  try {
+    const { collection, getDocs, query, where, orderBy } = window._fb;
+    let q = tab === 'today'
+      ? query(collection(db, 'scores'), where('date', '==', getTodayKey()), orderBy('tries'), orderBy('time'))
+      : query(collection(db, 'scores'), orderBy('tries'), orderBy('time'));
+
+    const snapshot = await getDocs(q);
+    let scores = [];
+    snapshot.forEach(d => scores.push(d.data()));
+
+    if (tab === 'alltime') {
+      const best = {};
+      scores.forEach(s => {
+        if (!best[s.name] || s.tries < best[s.name].tries || (s.tries === best[s.name].tries && s.time < best[s.name].time))
+          best[s.name] = s;
+      });
+      scores = Object.values(best).sort((a,b) => a.tries - b.tries || a.time - b.time);
     }
 
-    scores.sort((a,b) => a.tries - b.tries || a.time - b.time);
     document.getElementById('lb-loading').style.display = 'none';
     document.getElementById('lb-table').style.display = 'block';
 
@@ -914,7 +925,7 @@ async function loadLeaderboard(tab) {
 
     let html = '';
     if (scores.length === 0) {
-      html = `<div style="text-align:center;color:#93c5fd;padding:32px;font-weight:700;font-family:'Nunito',sans-serif;">No scores yet!<br><br>${tab === 'today' ? 'Be the first to play Daily Challenge today! 🚀' : 'Play Daily Challenge to appear here!'}</div>`;
+      html = `<div style="text-align:center;color:#93c5fd;padding:32px;font-weight:700;font-family:'Nunito',sans-serif;">No scores yet!<br><br>${tab === 'today' ? 'Be the first! 🚀' : 'Play Daily Challenge to appear here!'}</div>`;
     } else {
       top10.forEach((s, i) => {
         const rank = i + 1;
@@ -947,7 +958,10 @@ async function loadLeaderboard(tab) {
         </div>`;
     }
   } catch(e) {
+    console.error('Leaderboard error:', e);
+    document.getElementById('lb-loading').style.display = 'block';
     document.getElementById('lb-loading').textContent = 'Could not load scores. Try again!';
+    document.getElementById('lb-table').style.display = 'none';
   }
 }
 
