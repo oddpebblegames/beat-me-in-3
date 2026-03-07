@@ -117,6 +117,7 @@
   .btn-bot { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1a1a; }
   .btn-friend { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
   .btn-daily { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color: white; border: 2px solid #60a5fa; }
+  .btn-gold { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1a1a; }
   .btn-streak {
     background: transparent; color: #93c5fd;
     font-size: 0.95rem; font-weight: 700;
@@ -124,6 +125,40 @@
     padding: 8px; margin-top: 4px;
     font-family: 'Nunito', sans-serif;
   }
+
+  /* Unified secondary buttons (Streak / Stats) */
+  .secondary-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08);
+    color: #93c5fd;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.12s, background 0.12s;
+    margin-top: 4px;
+  }
+  .secondary-btn:active { transform: scale(0.96); background: rgba(255,255,255,0.15); }
+
+  /* Unified icon button (sound/theme top-right) */
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn:active { background: rgba(255,255,255,0.2); }
+
+  /* Menu icon — consistent size across all menu buttons */
+  .menu-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .menu-label { flex: 1; text-align: left; }
 
   .bot-icon { font-size: 1.6rem; }
 
@@ -344,20 +379,69 @@
   }
   .timer-num.danger { color: var(--red); }
 
-  /* Sound toggle */
+  /* Sound toggle (game screen) */
   .sound-btn {
     position: absolute;
     top: 16px; right: 16px;
     width: 36px; height: 36px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08);
     color: white;
     font-size: 1rem;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     z-index: 5;
   }
+  /* ---- STATS ---- */
+  .stat-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+  }
+  .stat-num { font-size: 1.8rem; font-weight: 900; color: var(--gold); margin-bottom: 4px; }
+  .stat-label { font-size: 0.75rem; font-weight: 700; color: #93c5fd; text-transform: uppercase; letter-spacing: 0.5px; }
+  .dist-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-family: 'Nunito', sans-serif; }
+  .dist-label { color: #93c5fd; font-weight: 800; font-size: 0.9rem; min-width: 20px; }
+  .dist-bar-bg { flex: 1; height: 24px; background: rgba(255,255,255,0.08); border-radius: 6px; overflow: hidden; }
+  .dist-bar { height: 100%; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 6px; min-width: 4px; display: flex; align-items: center; padding-left: 8px; }
+  .dist-bar.best { background: linear-gradient(135deg, var(--green), var(--green-dark)); }
+  .dist-count { color: white; font-weight: 800; font-size: 0.8rem; }
+
+  /* ---- DARK/LIGHT MODE ---- */
+  body.light-mode .app { background: linear-gradient(160deg, #dbeafe 0%, #bfdbfe 60%, #93c5fd 100%); }
+  body.light-mode .home-title { color: #1e3a8a; }
+  body.light-mode .home-title span { color: #d97706; }
+  body.light-mode .home-subtitle { color: #1d4ed8; }
+  body.light-mode .numpad-btn { background: linear-gradient(145deg, #bfdbfe, #93c5fd); color: #1e3a8a; box-shadow: 0 4px 0 #60a5fa; }
+  body.light-mode .hint-box { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+  body.light-mode .game-title { color: #1e3a8a; }
+  body.light-mode .game-title span { color: #d97706; }
+  body.light-mode .guess-prompt { color: #1d4ed8; }
+  body.light-mode .dot { border-color: #1d4ed8; }
+  body.light-mode .result-title { color: #1e3a8a; }
+  body.light-mode .result-sub { color: #1d4ed8; }
+  body.light-mode .stat-card { background: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.8); }
+  body.light-mode .stat-label { color: #1d4ed8; }
+  body.light-mode .lb-row { background: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.7); }
+  body.light-mode .lb-name { color: #1e3a8a; }
+  body.light-mode .modal { background: linear-gradient(145deg, #dbeafe, #bfdbfe); }
+  body.light-mode .modal h2 { color: #1e3a8a; }
+
+  /* ---- NUMPAD THEMES ---- */
+  .theme-fire .numpad-btn { background: linear-gradient(145deg, #ef4444, #dc2626); }
+  .theme-fire .numpad-btn.selected { background: linear-gradient(145deg, #f97316, #ea580c); }
+  .theme-purple .numpad-btn { background: linear-gradient(145deg, #7c3aed, #5b21b6); }
+  .theme-purple .numpad-btn.selected { background: linear-gradient(145deg, #a855f7, #7c3aed); }
+  .theme-gold .numpad-btn { background: linear-gradient(145deg, #d97706, #92400e); }
+  .theme-gold .numpad-btn.selected { background: linear-gradient(145deg, #f59e0b, #d97706); color: #1a1a1a; }
+
+  /* ---- COUNTRY FLAG ---- */
+  .lb-flag { font-size: 1rem; min-width: 24px; text-align: center; }
+
   /* ---- LEADERBOARD ---- */
   .lb-row {
     display: flex;
@@ -502,6 +586,8 @@
   .result-btn:active { transform: scale(0.97); }
   .btn-share { background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%); color: white; }
   .btn-again { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+  .btn-taunt { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: white; }
+  .result-btn.btn-gold { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1a1a; }
   .btn-home-small { background: transparent; color: #93c5fd; font-size: 0.95rem; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; padding: 8px; }
 
   /* Streak modal */
@@ -620,27 +706,40 @@
   <!-- HOME SCREEN -->
   <div class="screen active" id="screen-home">
     <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
+      <!-- Top right controls -->
+      <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;">
+        <button class="icon-btn" id="home-sound-btn" onclick="toggleSound()">🔊</button>
+        <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+      </div>
       <img src="icon-192.png" alt="Beat Me in 3" style="width:90px;height:90px;border-radius:22px;margin-bottom:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
       <h1 class="home-title">Beat Me in <span>3</span></h1>
       <p class="home-subtitle">Guess the number in 3 tries or less</p>
 
       <button class="menu-btn btn-bot" onclick="startBotGame()">
-        <span class="bot-icon">⚡</span> Quick Challenge
+        <span class="menu-icon">⚡</span>
+        <span class="menu-label">Quick Challenge</span>
       </button>
       <button class="menu-btn btn-friend" onclick="showScreen('screen-friend-set')">
-        <span>👥</span> Challenge a Friend
+        <span class="menu-icon">👥</span>
+        <span class="menu-label">Challenge a Friend</span>
       </button>
-      <button class="menu-btn btn-daily" onclick="startDailyChallenge()">
+      <button class="menu-btn btn-daily" id="daily-btn" onclick="startDailyChallenge()">
         <span id="calendar-icon" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:white;border-radius:8px;flex-shrink:0;flex-direction:column;line-height:1;overflow:hidden;">
           <span style="background:#ef4444;color:white;font-size:0.45rem;font-weight:900;width:100%;text-align:center;padding:1px 0;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" id="cal-month"></span>
           <span style="color:#1a1a1a;font-size:0.85rem;font-weight:900;font-family:'Nunito',sans-serif;" id="cal-day"></span>
         </span>
-        Daily Challenge
+        <span class="menu-label">Daily Challenge</span>
+        <span id="daily-counter" style="margin-left:auto;background:rgba(0,0,0,0.2);border-radius:20px;padding:2px 10px;font-size:0.78rem;font-weight:800;"></span>
       </button>
-      <button class="menu-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;" onclick="openLeaderboard()">
-        <span>🏆</span> Leaderboard
+      <button class="menu-btn btn-gold" onclick="openLeaderboard()">
+        <span class="menu-icon">🏆</span>
+        <span class="menu-label">Leaderboard</span>
       </button>
-      <button class="btn-streak" onclick="showStreak()">View Streak 🔥</button>
+
+      <div style="display:flex;gap:10px;width:100%;max-width:300px;margin-top:0;">
+        <button class="secondary-btn" onclick="showStreak()">🔥 Streak</button>
+        <button class="secondary-btn" onclick="showStats()">📊 My Stats</button>
+      </div>
     </div>
   </div>
 
@@ -708,7 +807,7 @@
     <button class="back-btn" onclick="showScreen('screen-home')">←</button>
     <div style="width:100%;padding-top:16px;">
       <div style="text-align:center;margin-bottom:8px;">
-        <div class="game-title" style="font-size:1.4rem;">🏆 Leaderboard</div>
+        <div class="game-title" style="font-size:1.4rem;">Leaderboard</div>
         <div id="lb-date" style="color:#93c5fd;font-size:0.85rem;font-weight:600;margin-bottom:12px;"></div>
       </div>
 
@@ -730,8 +829,9 @@
     <div class="result-icon">🎉</div>
     <div class="result-title">You Got It!</div>
     <p class="result-sub" id="win-sub">You guessed it in <u id="win-tries">1</u> tr<span id="win-try-word">y</span>!</p>
-    <button class="result-btn btn-share" onclick="shareScore(true)">🔗 Share Your Score</button>
-    <button class="result-btn" id="lb-btn-win" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;display:none;" onclick="openLeaderboard()">🏆 See Leaderboard</button>
+    <button class="result-btn btn-share" onclick="shareScore(true)">Share Your Score</button>
+    <button class="result-btn btn-taunt" id="taunt-btn-win" style="display:none;" onclick="showTaunt()">Send a Taunt</button>
+    <button class="result-btn btn-gold" id="lb-btn-win" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
     <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
   </div>
@@ -741,16 +841,62 @@
     <div class="result-icon">😅</div>
     <div class="result-title">You Lost!</div>
     <p class="result-sub">The number was <u id="lose-number" style="color:var(--gold);">?</u></p>
-    <button class="result-btn btn-share" onclick="shareScore(false)">🔗 Share Your Score</button>
-    <button class="result-btn" id="lb-btn-lose" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;display:none;" onclick="openLeaderboard()">🏆 See Leaderboard</button>
+    <button class="result-btn btn-share" onclick="shareScore(false)">Share Your Score</button>
+    <button class="result-btn btn-gold" id="lb-btn-lose" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
     <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
+  </div>
+
+  <!-- STATS SCREEN -->
+  <div class="screen" id="screen-stats">
+    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <div style="width:100%;padding-top:16px;display:flex;flex-direction:column;align-items:center;">
+      <div class="game-title" style="font-size:1.4rem;margin-bottom:4px;">My Stats</div>
+      <div style="color:#93c5fd;font-size:0.85rem;font-weight:600;margin-bottom:24px;" id="stats-username"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:340px;padding:0 16px;">
+        <div class="stat-card"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Games Played</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-wins">0</div><div class="stat-label">Wins</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-winrate">0%</div><div class="stat-label">Win Rate</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-avg">-</div><div class="stat-label">Avg Tries</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-best">-</div><div class="stat-label">Best Time</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">🔥 Streak</div></div>
+      </div>
+
+      <!-- Try distribution -->
+      <div style="width:100%;max-width:340px;padding:16px;margin-top:8px;">
+        <div style="color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;margin-bottom:12px;">Guess Distribution</div>
+        <div id="guess-dist"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUY MATCHES MODAL -->
+  <div class="modal-overlay" id="buy-matches-modal">
+    <div class="modal">
+      <h2>Get More Matches</h2>
+      <p>You've used all your daily matches! Come back tomorrow or buy more.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <button class="modal-close" style="background:linear-gradient(135deg,#22c55e,#16a34a);padding:14px;" onclick="buyMatches(5)">5 Matches — $0.99</button>
+        <button class="modal-close" style="background:linear-gradient(135deg,#22c55e,#16a34a);padding:14px;" onclick="buyMatches(20)">20 Matches — $2.99 <span style="color:#f59e0b;font-size:0.8rem;">BEST VALUE</span></button>
+      </div>
+      <button class="modal-close" style="background:#374151;" onclick="document.getElementById('buy-matches-modal').classList.remove('active')">Maybe Later</button>
+    </div>
+  </div>
+
+  <!-- TAUNT MODAL -->
+  <div class="modal-overlay" id="taunt-modal">
+    <div class="modal">
+      <h2>Send a Taunt</h2>
+      <p>Challenge your friend with a message!</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;" id="taunt-list"></div>
+      <button class="modal-close" style="background:#374151;" onclick="document.getElementById('taunt-modal').classList.remove('active')">Skip</button>
+    </div>
   </div>
 
   <!-- STREAK MODAL -->
   <div class="modal-overlay" id="streak-modal">
     <div class="modal">
-      <h2>🔥 Your Streak</h2>
+      <h2>Your Streak 🔥</h2>
       <div class="streak-number" id="streak-display">0</div>
       <p>days in a row</p>
       <p style="margin-bottom:24px; font-size:0.85rem;">Best: <span id="best-streak" style="color:var(--gold); font-weight:800;">0</span> days</p>
@@ -761,7 +907,7 @@
   <!-- BUY HINTS MODAL -->
   <div class="modal-overlay" id="buy-hints-modal">
     <div class="modal">
-      <h2>💡 Get Hints</h2>
+      <h2>Get Hints 💡</h2>
       <p>Use hints to reveal a number range before guessing!</p>
       <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
         <button class="modal-close" style="background:linear-gradient(135deg,#7c3aed,#5b21b6); padding:14px;" onclick="buyHints(1)">1 Hint — $0.99</button>
@@ -854,7 +1000,8 @@ async function submitDailyScore(tries, won) {
   try {
     const existing = await getDoc(ref);
     if (existing.exists()) return;
-    await setDoc(ref, { name: myUsername, tries: won ? tries : 99, time: timeTaken, date: todayKey, timestamp: Date.now() });
+    const flag = await getCountryFlag();
+    await setDoc(ref, { name: myUsername, tries: won ? tries : 99, time: timeTaken, date: todayKey, timestamp: Date.now(), flag });
   } catch(e) { console.error('Score submit error:', e); }
 }
 
@@ -936,6 +1083,7 @@ async function loadLeaderboard(tab) {
         const timeLabel = s.tries === 99 ? '' : `${s.time}s`;
         html += `<div class="lb-row ${rankClass} ${isMe?'me':''}">
           <div class="lb-rank">${rankLabel}</div>
+          <div class="lb-flag">${s.flag||'🌍'}</div>
           <div class="lb-name">${s.name}${isMe?' 👈':''}</div>
           <div class="lb-tries">${triesLabel}</div>
           <div class="lb-time">${timeLabel}</div>
@@ -1101,7 +1249,10 @@ function stopBGM() {
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
-  document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+  const icon = soundEnabled ? '🔊' : '🔇';
+  document.getElementById('sound-btn').textContent = icon;
+  const homeBtn = document.getElementById('home-sound-btn');
+  if (homeBtn) homeBtn.textContent = icon;
   if (soundEnabled) startBGM(); else stopBGM();
 }
 
@@ -1221,7 +1372,13 @@ function startBotGame() {
 }
 
 function startDailyChallenge() {
+  if (getRemainingMatches() <= 0) {
+    document.getElementById('buy-matches-modal').classList.add('active');
+    return;
+  }
   ensureUsername(() => {
+    incrementDailyMatches();
+    updateDailyCounter();
     gameMode = 'daily';
     const today = new Date().toDateString();
     let seed = 0;
@@ -1401,10 +1558,13 @@ function submitGuess() {
 function showWin(tries) {
   stopBGM();
   sfxWin();
+  updateStats(true, tries);
   document.getElementById('win-tries').textContent = tries;
   document.getElementById('win-try-word').textContent = tries === 1 ? 'y' : 'ies';
   const isDaily = gameMode === 'daily';
+  const isFriend = gameMode === 'friend';
   document.getElementById('lb-btn-win').style.display = isDaily ? 'block' : 'none';
+  document.getElementById('taunt-btn-win').style.display = isFriend ? 'block' : 'none';
   if (isDaily) submitDailyScore(tries, true);
   spawnConfetti();
   showScreen('screen-win');
@@ -1413,6 +1573,7 @@ function showWin(tries) {
 function showLose() {
   stopBGM();
   sfxLose();
+  updateStats(false, 0);
   document.getElementById('lose-number').textContent = secretNumber;
   const isDaily = gameMode === 'daily';
   document.getElementById('lb-btn-lose').style.display = isDaily ? 'block' : 'none';
@@ -1458,6 +1619,172 @@ function closeStreak() {
   document.getElementById('streak-modal').classList.remove('active');
 }
 
+// === Daily Match Limit ===
+const MAX_DAILY_MATCHES = 10;
+let extraMatches = parseInt(localStorage.getItem('bmi3_extra_matches') || '0');
+let extraMatchesDate = localStorage.getItem('bmi3_extra_matches_date') || '';
+
+function getDailyMatchesUsed() {
+  const today = getTodayKey();
+  const stored = JSON.parse(localStorage.getItem('bmi3_daily_matches') || '{}');
+  if (stored.date !== today) return 0;
+  return stored.count || 0;
+}
+
+function incrementDailyMatches() {
+  const today = getTodayKey();
+  const stored = JSON.parse(localStorage.getItem('bmi3_daily_matches') || '{}');
+  const count = (stored.date === today ? stored.count : 0) + 1;
+  localStorage.setItem('bmi3_daily_matches', JSON.stringify({ date: today, count }));
+}
+
+function getRemainingMatches() {
+  const today = getTodayKey();
+  // Reset extra matches if from a different day
+  if (extraMatchesDate !== today) {
+    extraMatches = 0;
+    localStorage.setItem('bmi3_extra_matches', '0');
+    localStorage.setItem('bmi3_extra_matches_date', today);
+  }
+  const used = getDailyMatchesUsed();
+  return Math.max(0, MAX_DAILY_MATCHES + extraMatches - used);
+}
+
+function updateDailyCounter() {
+  const remaining = getRemainingMatches();
+  const counter = document.getElementById('daily-counter');
+  const btn = document.getElementById('daily-btn');
+  if (remaining <= 0) {
+    counter.textContent = '0 left';
+    counter.style.background = 'rgba(239,68,68,0.4)';
+    btn.style.opacity = '0.6';
+  } else {
+    counter.textContent = `${remaining} left`;
+    counter.style.background = remaining <= 3 ? 'rgba(239,68,68,0.3)' : 'rgba(0,0,0,0.2)';
+    btn.style.opacity = '1';
+  }
+}
+
+function buyMatches(amount) {
+  extraMatches += amount;
+  extraMatchesDate = getTodayKey();
+  localStorage.setItem('bmi3_extra_matches', extraMatches);
+  localStorage.setItem('bmi3_extra_matches_date', extraMatchesDate);
+  document.getElementById('buy-matches-modal').classList.remove('active');
+  updateDailyCounter();
+  showToast(`${amount} matches added! 🎮`);
+}
+
+// === Stats ===
+function updateStats(won, tries) {
+  const stats = JSON.parse(localStorage.getItem('bmi3_stats') || '{"played":0,"wins":0,"totalTries":0,"bestTime":null,"dist":{}}');
+  stats.played++;
+  if (won) {
+    stats.wins++;
+    stats.totalTries += tries;
+    stats.dist[tries] = (stats.dist[tries] || 0) + 1;
+    const t = Math.round((Date.now() - gameStartTime) / 1000);
+    if (!stats.bestTime || t < stats.bestTime) stats.bestTime = t;
+  }
+  localStorage.setItem('bmi3_stats', JSON.stringify(stats));
+}
+
+function showStats() {
+  const stats = JSON.parse(localStorage.getItem('bmi3_stats') || '{"played":0,"wins":0,"totalTries":0,"bestTime":null,"dist":{}}');
+  document.getElementById('stats-username').textContent = myUsername ? `@${myUsername}` : 'Set your name in Daily Challenge';
+  document.getElementById('stat-played').textContent = stats.played;
+  document.getElementById('stat-wins').textContent = stats.wins;
+  document.getElementById('stat-winrate').textContent = stats.played ? Math.round(stats.wins/stats.played*100) + '%' : '0%';
+  document.getElementById('stat-avg').textContent = stats.wins ? (stats.totalTries/stats.wins).toFixed(1) : '-';
+  document.getElementById('stat-best').textContent = stats.bestTime ? stats.bestTime + 's' : '-';
+  document.getElementById('stat-streak').textContent = streak;
+
+  // Guess distribution
+  const maxVal = Math.max(...[1,2,3].map(i => stats.dist[i] || 0), 1);
+  let distHtml = '';
+  [1,2,3].forEach(i => {
+    const val = stats.dist[i] || 0;
+    const pct = Math.round((val/maxVal)*100);
+    distHtml += `<div class="dist-row">
+      <div class="dist-label">${i}</div>
+      <div class="dist-bar-bg"><div class="dist-bar ${val===Math.max(...Object.values(stats.dist||{1:0})) ? 'best':''}" style="width:${Math.max(pct,4)}%"><span class="dist-count">${val}</span></div></div>
+    </div>`;
+  });
+  document.getElementById('guess-dist').innerHTML = distHtml;
+  showScreen('screen-stats');
+}
+
+// === Dark/Light Mode ===
+let isLightMode = localStorage.getItem('bmi3_theme') === 'light';
+function applyTheme() {
+  document.body.classList.toggle('light-mode', isLightMode);
+  document.getElementById('theme-btn').textContent = isLightMode ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  isLightMode = !isLightMode;
+  localStorage.setItem('bmi3_theme', isLightMode ? 'light' : 'dark');
+  applyTheme();
+}
+applyTheme();
+
+// === Numpad Themes ===
+const THEMES = ['default', 'fire', 'purple', 'gold'];
+let currentTheme = localStorage.getItem('bmi3_numpad_theme') || 'default';
+function applyNumpadTheme() {
+  const numpad = document.querySelector('.numpad');
+  if (!numpad) return;
+  THEMES.forEach(t => numpad.classList.remove(`theme-${t}`));
+  if (currentTheme !== 'default') numpad.classList.add(`theme-${currentTheme}`);
+}
+
+// === Country Flag ===
+async function getCountryFlag() {
+  const stored = localStorage.getItem('bmi3_flag');
+  if (stored) return stored;
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    const flag = getFlagEmoji(data.country_code);
+    localStorage.setItem('bmi3_flag', flag);
+    return flag;
+  } catch(e) { return '🌍'; }
+}
+
+function getFlagEmoji(countryCode) {
+  if (!countryCode) return '🌍';
+  return countryCode.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt()));
+}
+
+// === Taunt Messages ===
+const TAUNTS = [
+  "Bet you can't guess mine! 😏",
+  "I got it in ${tries} tries. Your turn! 🎯",
+  "Easy peasy! Can you beat ${tries}/3? 😎",
+  "Too slow! I got it in ${tries}! ⚡",
+  "Challenge accepted? I scored ${tries}/3 🏆",
+  "Your brain vs mine. Go! 🧠"
+];
+
+function showTaunt() {
+  const tries = document.getElementById('win-tries').textContent;
+  const list = document.getElementById('taunt-list');
+  list.innerHTML = TAUNTS.map(t => {
+    const msg = t.replace('${tries}', tries);
+    return `<button class="modal-close" style="background:rgba(255,255,255,0.1);color:white;font-size:0.9rem;padding:12px;text-align:left;" onclick="sendTaunt('${msg}')">${msg}</button>`;
+  }).join('');
+  document.getElementById('taunt-modal').classList.add('active');
+}
+
+function sendTaunt(msg) {
+  document.getElementById('taunt-modal').classList.remove('active');
+  const fullMsg = `${msg}\nPlay Beat Me in 3: https://oddpebblegames.github.io/beat-me-in-3`;
+  if (navigator.share) {
+    navigator.share({ title: 'Beat Me in 3', text: fullMsg });
+  } else {
+    copyToClipboard(fullMsg);
+  }
+}
+
 // === Share ===
 function shareScore(won) {
   const tries = won ? document.getElementById('win-tries').textContent : '3';
@@ -1485,10 +1812,52 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+
 // Set daily challenge calendar icon
 const _now = new Date();
 document.getElementById('cal-month').textContent = _now.toLocaleDateString('en-US', { month:'short' }).toUpperCase();
 document.getElementById('cal-day').textContent = _now.getDate();
+
+// Init daily counter
+updateDailyCounter();
+
+// Sync home sound button
+document.getElementById('home-sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+
+// Apply numpad theme on load
+window.addEventListener('load', applyNumpadTheme);
+
+// Push Notifications
+async function requestPushPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') scheduleDailyNotification();
+  } else if (Notification.permission === 'granted') {
+    scheduleDailyNotification();
+  }
+}
+
+function scheduleDailyNotification() {
+  if (!('serviceWorker' in navigator)) return;
+  // Schedule a notification for next day at 8am
+  const now = new Date();
+  const next = new Date(now);
+  next.setDate(next.getDate() + 1);
+  next.setHours(8, 0, 0, 0);
+  const delay = next - now;
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      new Notification("Beat Me in 3 🎮", {
+        body: "Today's Daily Challenge is ready! Can you guess the number?",
+        icon: '/beat-me-in-3/icon-192.png'
+      });
+    }
+  }, delay);
+}
+
+// Request push after 3 seconds
+setTimeout(requestPushPermission, 3000);
 
 // Close modal on overlay click
 document.getElementById('streak-modal').addEventListener('click', function(e) {
