@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.oddpebblegames.beatmein3",
-        "sha256_cert_fingerprints": ["CC:61:58:79:9B:65:F1:C6:04:1E:FD:95:14:73:58:AB:43:6D:E2:31:CF:DA:2F:63:2E:62:84:76:5F:E2:CA:7C"]
-      }
-    }]
