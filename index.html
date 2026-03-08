@@ -442,6 +442,15 @@
   /* ---- COUNTRY FLAG ---- */
   .lb-flag { font-size: 1rem; min-width: 24px; text-align: center; }
 
+  /* ---- ONBOARDING ---- */
+  .onboard-slide { display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .onboard-icon { font-size:5rem; margin-bottom:20px; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .onboard-title { font-family:'Nunito',sans-serif; font-size:2rem; font-weight:900; color:white; margin-bottom:16px; }
+  .onboard-body { font-family:'Nunito',sans-serif; font-size:1.05rem; font-weight:600; color:#93c5fd; line-height:1.6; max-width:300px; }
+  .onboard-body strong { color:white; }
+  .onboard-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.25); transition:all 0.3s; }
+  .onboard-dot.active { background:var(--gold); width:28px; border-radius:5px; }
+
   /* ---- LEADERBOARD ---- */
   .lb-row {
     display: flex;
@@ -734,7 +743,11 @@
       <button class="menu-btn btn-gold" onclick="openLeaderboard()">
         <span class="menu-icon">🏆</span>
         <span class="menu-label">Leaderboard</span>
+        <span id="home-player-count" style="margin-left:auto;background:rgba(0,0,0,0.2);border-radius:20px;padding:2px 10px;font-size:0.78rem;font-weight:800;display:none;"></span>
       </button>
+
+      <!-- Next reset countdown -->
+      <div id="home-countdown" style="color:#93c5fd;font-size:0.8rem;font-weight:700;font-family:'Nunito',sans-serif;margin-top:-8px;margin-bottom:8px;letter-spacing:0.3px;"></div>
 
       <div style="display:flex;gap:10px;width:100%;max-width:300px;margin-top:0;">
         <button class="secondary-btn" onclick="showStreak()">🔥 Streak</button>
@@ -797,8 +810,19 @@
         <button class="picker-btn" onclick="changePickerNum(1)">›</button>
       </div>
 
-      <button class="create-challenge-btn" onclick="startFriendChallenge()">Create Challenge</button>
-      <p class="share-hint">Share the link with your friend!</p>
+      <button class="create-challenge-btn" onclick="createFriendChallenge()">Create Challenge</button>
+
+      <!-- Share link area — shown after challenge created -->
+      <div id="challenge-link-box" style="display:none;width:100%;max-width:300px;margin-top:16px;">
+        <div style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px;margin-bottom:10px;">
+          <div style="color:#93c5fd;font-size:0.75rem;font-weight:700;margin-bottom:6px;font-family:'Nunito',sans-serif;">CHALLENGE LINK</div>
+          <div id="challenge-link-text" style="color:white;font-size:0.85rem;font-weight:700;font-family:'Nunito',sans-serif;word-break:break-all;"></div>
+        </div>
+        <button class="create-challenge-btn" style="margin-top:0;background:linear-gradient(135deg,#22c55e,#16a34a);" onclick="shareFriendChallenge()">Send to Friend</button>
+        <button class="create-challenge-btn" style="margin-top:10px;" onclick="playFriendChallenge()">Play on This Device</button>
+      </div>
+
+      <p class="share-hint" id="share-hint-text">Your friend will try to guess your number!</p>
     </div>
   </div>
 
@@ -829,7 +853,7 @@
     <div class="result-icon">🎉</div>
     <div class="result-title">You Got It!</div>
     <p class="result-sub" id="win-sub">You guessed it in <u id="win-tries">1</u> tr<span id="win-try-word">y</span>!</p>
-    <button class="result-btn btn-share" onclick="shareScore(true)">Share Your Score</button>
+    <button class="result-btn btn-share" onclick="showResultCard(true)">Share Your Score</button>
     <button class="result-btn btn-taunt" id="taunt-btn-win" style="display:none;" onclick="showTaunt()">Send a Taunt</button>
     <button class="result-btn btn-gold" id="lb-btn-win" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
@@ -841,7 +865,7 @@
     <div class="result-icon">😅</div>
     <div class="result-title">You Lost!</div>
     <p class="result-sub">The number was <u id="lose-number" style="color:var(--gold);">?</u></p>
-    <button class="result-btn btn-share" onclick="shareScore(false)">Share Your Score</button>
+    <button class="result-btn btn-share" onclick="showResultCard(false)">Share Your Score</button>
     <button class="result-btn btn-gold" id="lb-btn-lose" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
     <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
@@ -893,6 +917,54 @@
     </div>
   </div>
 
+  <!-- ONBOARDING SCREEN -->
+  <div class="screen" id="screen-onboarding" style="background:linear-gradient(160deg,#0d2060,#1a3fa8,#1e3a8a);">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:24px;">
+      <div id="onboard-slides">
+
+        <div class="onboard-slide" id="slide-0">
+          <div class="onboard-icon">🎯</div>
+          <div class="onboard-title">Guess the Number</div>
+          <div class="onboard-body">A secret number between 0 and 9 is hiding. You have <strong>3 tries</strong> to find it. After each guess you'll know if you're too high, too low, or spot on.</div>
+        </div>
+
+        <div class="onboard-slide" id="slide-1" style="display:none;">
+          <div class="onboard-icon">📅</div>
+          <div class="onboard-title">Play Every Day</div>
+          <div class="onboard-body">Everyone gets the <strong>same number</strong> in Daily Challenge. Compete on the global leaderboard. Build your streak. Come back tomorrow for a new number.</div>
+        </div>
+
+        <div class="onboard-slide" id="slide-2" style="display:none;">
+          <div class="onboard-icon">👥</div>
+          <div class="onboard-title">Challenge Friends</div>
+          <div class="onboard-body">Set a secret number, send a link, and see if your friend can beat you. Use <strong>hints</strong> when you're stuck. Share your score and taunt your rivals!</div>
+        </div>
+
+      </div>
+
+      <!-- Dots -->
+      <div style="display:flex;gap:8px;margin:24px 0;">
+        <div class="onboard-dot active" id="odot-0"></div>
+        <div class="onboard-dot" id="odot-1"></div>
+        <div class="onboard-dot" id="odot-2"></div>
+      </div>
+
+      <button class="menu-btn btn-bot" style="max-width:280px;" id="onboard-next-btn" onclick="onboardNext()">Next</button>
+      <button class="btn-home-small" onclick="skipOnboarding()">Skip</button>
+    </div>
+  </div>
+
+  <!-- RESULT CARD MODAL -->
+  <div class="modal-overlay" id="result-card-modal">
+    <div class="modal" style="padding:0;overflow:hidden;border-radius:24px;max-width:340px;">
+      <canvas id="result-canvas" width="680" height="780" style="width:100%;display:block;border-radius:24px 24px 0 0;"></canvas>
+      <div style="display:flex;gap:8px;padding:14px;background:#1a3fa8;">
+        <button onclick="shareResultCard()" style="flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">Share</button>
+        <button onclick="document.getElementById('result-card-modal').classList.remove('active')" style="padding:14px 18px;border-radius:12px;border:none;background:rgba(255,255,255,0.15);color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- STREAK MODAL -->
   <div class="modal-overlay" id="streak-modal">
     <div class="modal">
@@ -908,11 +980,12 @@
   <div class="modal-overlay" id="buy-hints-modal">
     <div class="modal">
       <h2>Get Hints 💡</h2>
-      <p>Use hints to reveal a number range before guessing!</p>
-      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-        <button class="modal-close" style="background:linear-gradient(135deg,#7c3aed,#5b21b6); padding:14px;" onclick="buyHints(1)">1 Hint — $0.99</button>
-        <button class="modal-close" style="background:linear-gradient(135deg,#7c3aed,#5b21b6); padding:14px;" onclick="buyHints(5)">5 Hints — $3.99 <span style="color:#f59e0b; font-size:0.8rem;">BEST VALUE</span></button>
+      <p>Reveal a number range to help you guess! Hints will be available via in-app purchase soon.</p>
+      <div style="background:rgba(255,255,255,0.06);border-radius:14px;padding:14px;margin-bottom:16px;text-align:center;">
+        <div style="font-family:'Nunito',sans-serif;font-size:1.5rem;font-weight:900;color:var(--gold);">Coming Soon</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.85rem;color:#93c5fd;margin-top:4px;">In-app purchases launching shortly</div>
       </div>
+      <button class="modal-close" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);padding:14px;margin-bottom:10px;" onclick="getTrialHint()">Try 1 Free Hint</button>
       <button class="modal-close" style="background:#374151;" onclick="closeBuyHints()">Maybe Later</button>
     </div>
   </div>
@@ -990,18 +1063,48 @@ function saveUsername() {
   if (window._usernameCallback) { window._usernameCallback(); window._usernameCallback = null; }
 }
 
+// === Daily Score State ===
+// Stored in localStorage: { date, totalTries, totalTime, matchesPlayed, matchesWon }
+function getDailyScoreState() {
+  const today = getTodayKey();
+  const stored = JSON.parse(localStorage.getItem('bmi3_daily_score') || '{}');
+  if (stored.date !== today) return { date: today, totalTries: 0, totalTime: 0, matchesPlayed: 0, matchesWon: 0 };
+  return stored;
+}
+
+function saveDailyScoreState(state) {
+  localStorage.setItem('bmi3_daily_score', JSON.stringify(state));
+}
+
 async function submitDailyScore(tries, won) {
   if (gameMode !== 'daily' || !myUsername || !db) return;
   const timeTaken = Math.round((Date.now() - gameStartTime) / 1000);
   const todayKey = getTodayKey();
-  const { doc, setDoc, getDoc } = window._fb;
+
+  // Update local state
+  const state = getDailyScoreState();
+  state.totalTries += won ? tries : 3; // count 3 for a loss
+  state.totalTime += timeTaken;
+  state.matchesPlayed += 1;
+  if (won) state.matchesWon += 1;
+  saveDailyScoreState(state);
+
+  // Push to Firestore — upsert (overwrite each time with latest running total)
+  const { doc, setDoc } = window._fb;
   const scoreId = `${todayKey}_${myUsername.replace(/\s+/g,'_')}`;
   const ref = doc(db, 'scores', scoreId);
   try {
-    const existing = await getDoc(ref);
-    if (existing.exists()) return;
     const flag = await getCountryFlag();
-    await setDoc(ref, { name: myUsername, tries: won ? tries : 99, time: timeTaken, date: todayKey, timestamp: Date.now(), flag });
+    await setDoc(ref, {
+      name: myUsername,
+      totalTries: state.totalTries,
+      totalTime: state.totalTime,
+      matchesPlayed: state.matchesPlayed,
+      matchesWon: state.matchesWon,
+      date: todayKey,
+      timestamp: Date.now(),
+      flag
+    });
   } catch(e) { console.error('Score submit error:', e); }
 }
 
@@ -1047,8 +1150,8 @@ async function loadLeaderboard(tab) {
   try {
     const { collection, getDocs, query, where, orderBy } = window._fb;
     let q = tab === 'today'
-      ? query(collection(db, 'scores'), where('date', '==', getTodayKey()), orderBy('tries'), orderBy('time'))
-      : query(collection(db, 'scores'), orderBy('tries'), orderBy('time'));
+      ? query(collection(db, 'scores'), where('date', '==', getTodayKey()), orderBy('totalTries'), orderBy('totalTime'))
+      : query(collection(db, 'scores'), orderBy('totalTries'), orderBy('totalTime'));
 
     const snapshot = await getDocs(q);
     let scores = [];
@@ -1057,10 +1160,11 @@ async function loadLeaderboard(tab) {
     if (tab === 'alltime') {
       const best = {};
       scores.forEach(s => {
-        if (!best[s.name] || s.tries < best[s.name].tries || (s.tries === best[s.name].tries && s.time < best[s.name].time))
+        if (!best[s.name] || s.totalTries < best[s.name].totalTries ||
+           (s.totalTries === best[s.name].totalTries && s.totalTime < best[s.name].totalTime))
           best[s.name] = s;
       });
-      scores = Object.values(best).sort((a,b) => a.tries - b.tries || a.time - b.time);
+      scores = Object.values(best).sort((a,b) => a.totalTries - b.totalTries || a.totalTime - b.totalTime);
     }
 
     document.getElementById('lb-loading').style.display = 'none';
@@ -1079,14 +1183,13 @@ async function loadLeaderboard(tab) {
         const isMe = s.name === myUsername;
         const rankClass = rank <= 3 ? `top${rank}` : '';
         const rankLabel = rank <= 3 ? medals[rank-1] : `#${rank}`;
-        const triesLabel = s.tries === 99 ? '✗ Lost' : `${s.tries} tr${s.tries===1?'y':'ies'}`;
-        const timeLabel = s.tries === 99 ? '' : `${s.time}s`;
+        const played = s.matchesPlayed || 1;
         html += `<div class="lb-row ${rankClass} ${isMe?'me':''}">
           <div class="lb-rank">${rankLabel}</div>
           <div class="lb-flag">${s.flag||'🌍'}</div>
           <div class="lb-name">${s.name}${isMe?' 👈':''}</div>
-          <div class="lb-tries">${triesLabel}</div>
-          <div class="lb-time">${timeLabel}</div>
+          <div class="lb-tries">${s.totalTries} pts</div>
+          <div class="lb-time">${played}/10</div>
         </div>`;
       });
     }
@@ -1094,15 +1197,15 @@ async function loadLeaderboard(tab) {
 
     if (myRank > 10 && myUsername) {
       const me = scores[myRank-1];
-      const triesLabel = me.tries === 99 ? '✗ Lost' : `${me.tries} tr${me.tries===1?'y':'ies'}`;
       document.getElementById('lb-my-row').style.display = 'block';
       document.getElementById('lb-my-row').innerHTML = `
         <div class="lb-separator">• • •</div>
         <div class="lb-row me">
           <div class="lb-rank">#${myRank}</div>
+          <div class="lb-flag">${me.flag||'🌍'}</div>
           <div class="lb-name">${me.name} 👈</div>
-          <div class="lb-tries">${triesLabel}</div>
-          <div class="lb-time">${me.time}s</div>
+          <div class="lb-tries">${me.totalTries} pts</div>
+          <div class="lb-time">${me.matchesPlayed}/10</div>
         </div>`;
     }
   } catch(e) {
@@ -1380,26 +1483,19 @@ function startDailyChallenge() {
     incrementDailyMatches();
     updateDailyCounter();
     gameMode = 'daily';
-    const today = new Date().toDateString();
-    let seed = 0;
-    for (const c of today) seed += c.charCodeAt(0);
-    secretNumber = seed % 10;
+    // Each match gets a fresh random number
+    secretNumber = Math.floor(Math.random() * 10);
+    const state = getDailyScoreState();
     const label = document.getElementById('game-mode-label');
     label.style.display = 'block';
-    label.textContent = '📅 Daily Challenge';
+    label.textContent = `📅 Daily — Match ${state.matchesPlayed + 1}/10`;
     gameStartTime = Date.now();
     initGame();
   });
 }
 
 function startFriendChallenge() {
-  gameMode = 'friend';
-  secretNumber = pickerNum;
-  const label = document.getElementById('game-mode-label');
-  label.style.display = 'block';
-  label.textContent = '👥 Friend Challenge';
-  initGame();
-  showToast('Challenge created! Pass the phone 📱');
+  playFriendChallenge();
 }
 
 function initGame() {
@@ -1565,7 +1661,18 @@ function showWin(tries) {
   const isFriend = gameMode === 'friend';
   document.getElementById('lb-btn-win').style.display = isDaily ? 'block' : 'none';
   document.getElementById('taunt-btn-win').style.display = isFriend ? 'block' : 'none';
-  if (isDaily) submitDailyScore(tries, true);
+  if (isDaily) {
+    submitDailyScore(tries, true);
+    const state = getDailyScoreState();
+    const remaining = getRemainingMatches();
+    document.getElementById('win-sub').innerHTML = `Guessed in <u>${tries}</u> tr${tries===1?'y':'ies'}! Score so far: <u style="color:var(--gold)">${state.totalTries} pts</u> (${state.matchesPlayed}/10)`;
+    // Change Play Again to Next Match if more left
+    const againBtn = document.querySelector('#screen-win .btn-again');
+    if (againBtn) {
+      againBtn.textContent = remaining > 0 ? `Next Match (${remaining} left)` : 'Done for Today!';
+      againBtn.onclick = remaining > 0 ? startDailyChallenge : () => showScreen('screen-home');
+    }
+  }
   spawnConfetti();
   showScreen('screen-win');
 }
@@ -1577,7 +1684,17 @@ function showLose() {
   document.getElementById('lose-number').textContent = secretNumber;
   const isDaily = gameMode === 'daily';
   document.getElementById('lb-btn-lose').style.display = isDaily ? 'block' : 'none';
-  if (isDaily) submitDailyScore(3, false);
+  if (isDaily) {
+    submitDailyScore(3, false);
+    const state = getDailyScoreState();
+    const remaining = getRemainingMatches();
+    document.querySelector('#screen-lose .result-sub').innerHTML = `The number was <u style="color:var(--gold)">${secretNumber}</u> — Score: <u style="color:var(--gold)">${state.totalTries} pts</u> (${state.matchesPlayed}/10)`;
+    const againBtn = document.querySelector('#screen-lose .btn-again');
+    if (againBtn) {
+      againBtn.textContent = remaining > 0 ? `Next Match (${remaining} left)` : 'Done for Today!';
+      againBtn.onclick = remaining > 0 ? startDailyChallenge : () => showScreen('screen-home');
+    }
+  }
   showScreen('screen-lose');
 }
 
@@ -1786,18 +1903,346 @@ function sendTaunt(msg) {
 }
 
 // === Share ===
+// === Onboarding ===
+let onboardStep = 0;
+function checkOnboarding() {
+  if (!localStorage.getItem('bmi3_onboarded')) {
+    showScreen('screen-onboarding');
+  }
+}
+function onboardNext() {
+  const slides = document.querySelectorAll('.onboard-slide');
+  const dots = document.querySelectorAll('.onboard-dot');
+  dots[onboardStep].classList.remove('active');
+  onboardStep++;
+  if (onboardStep >= slides.length) {
+    skipOnboarding();
+    return;
+  }
+  slides[onboardStep - 1].style.display = 'none';
+  slides[onboardStep].style.display = 'flex';
+  dots[onboardStep].classList.add('active');
+  if (onboardStep === slides.length - 1) {
+    document.getElementById('onboard-next-btn').textContent = "Let's Play!";
+  }
+}
+function skipOnboarding() {
+  localStorage.setItem('bmi3_onboarded', '1');
+  showScreen('screen-home');
+}
+
+// === Friend Challenge Deep Link ===
+let pendingChallengeNum = null;
+
+function createFriendChallenge() {
+  pendingChallengeNum = pickerNum;
+  const encoded = btoa(`bmi3:${pickerNum}:${Date.now()}`);
+  const longUrl = `${location.origin}${location.pathname}?c=${encoded}`;
+
+  // Show link box immediately with long URL
+  const box = document.getElementById('challenge-link-box');
+  const linkText = document.getElementById('challenge-link-text');
+  const hint = document.getElementById('share-hint-text');
+  linkText.textContent = longUrl;
+  box.style.display = 'block';
+  hint.style.display = 'none';
+
+  // Try to shorten with TinyURL
+  fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`)
+    .then(r => r.text())
+    .then(short => { linkText.textContent = short; })
+    .catch(() => {}); // keep long URL if it fails
+}
+
+function shareFriendChallenge() {
+  const link = document.getElementById('challenge-link-text').textContent;
+  const msg = `Can you beat me? Guess my number in Beat Me in 3!\n${link}`;
+  if (navigator.share) {
+    navigator.share({ title: 'Beat Me in 3 Challenge', text: msg }).catch(() => copyToClipboard(msg));
+  } else {
+    copyToClipboard(link);
+    showToast('Link copied! Send it to your friend 📋');
+  }
+}
+
+function playFriendChallenge() {
+  gameMode = 'friend';
+  secretNumber = pendingChallengeNum;
+  const label = document.getElementById('game-mode-label');
+  label.style.display = 'block';
+  label.textContent = '👥 Friend Challenge';
+  // Reset challenge link UI
+  document.getElementById('challenge-link-box').style.display = 'none';
+  document.getElementById('share-hint-text').style.display = 'block';
+  initGame();
+}
+
+// Check URL for incoming challenge
+function checkIncomingChallenge() {
+  const params = new URLSearchParams(location.search);
+  const c = params.get('c');
+  if (!c) return;
+  try {
+    const decoded = atob(c);
+    const parts = decoded.split(':');
+    if (parts[0] === 'bmi3' && parts[1] !== undefined) {
+      const num = parseInt(parts[1]);
+      if (num >= 0 && num <= 9) {
+        pendingChallengeNum = num;
+        gameMode = 'friend';
+        secretNumber = num;
+        const label = document.getElementById('game-mode-label');
+        label.style.display = 'block';
+        label.textContent = '👥 Friend Challenge';
+        // Start game after short delay to let app load
+        setTimeout(() => {
+          showToast("A friend challenged you! Good luck 🎯");
+          initGame();
+          showScreen('screen-game');
+        }, 800);
+      }
+    }
+  } catch(e) {}
+}
+
+// === Result Card (Canvas) ===
+let lastResultWon = false;
+let lastResultTries = 0;
+let lastResultTime = 0;
+let resultGuesses = []; // track each guess result: 'correct'|'wrong'
+
+function showResultCard(won) {
+  lastResultWon = won;
+  lastResultTries = won ? parseInt(document.getElementById('win-tries').textContent) : 3;
+  lastResultTime = Math.round((Date.now() - gameStartTime) / 1000);
+  drawResultCard(won);
+  document.getElementById('result-card-modal').classList.add('active');
+}
+
+function drawResultCard(won) {
+  const canvas = document.getElementById('result-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 680, H = 780;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#0d2060');
+  grad.addColorStop(0.5, '#1a3fa8');
+  grad.addColorStop(1, '#1e3a8a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Top accent bar
+  const accent = ctx.createLinearGradient(0, 0, W, 0);
+  accent.addColorStop(0, '#f59e0b');
+  accent.addColorStop(1, '#d97706');
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, W, 8);
+
+  // App name
+  ctx.font = 'bold 52px Nunito, Arial';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.fillText('Beat Me in', W/2 - 50, 90);
+  ctx.fillStyle = '#f59e0b';
+  ctx.fillText('3', W/2 + 130, 90);
+
+  // Date
+  const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  ctx.font = '600 26px Nunito, Arial';
+  ctx.fillStyle = '#93c5fd';
+  ctx.fillText(dateStr, W/2, 136);
+
+  // Result
+  ctx.font = 'bold 80px Nunito, Arial';
+  ctx.fillStyle = won ? '#22c55e' : '#ef4444';
+  ctx.fillText(won ? 'GOT IT!' : 'SO CLOSE!', W/2, 230);
+
+  // Guess grid
+  const boxSize = 100, gap = 20;
+  const totalW = 3 * boxSize + 2 * gap;
+  const startX = (W - totalW) / 2;
+  const startY = 270;
+
+  for (let i = 0; i < 3; i++) {
+    const x = startX + i * (boxSize + gap);
+    const y = startY;
+    const isCorrect = won && i === lastResultTries - 1;
+    const isUsed = i < lastResultTries;
+
+    // Box
+    ctx.beginPath();
+    roundRect(ctx, x, y, boxSize, boxSize, 16);
+    ctx.fillStyle = isCorrect ? 'rgba(34,197,94,0.3)' : isUsed ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.06)';
+    ctx.fill();
+    ctx.strokeStyle = isCorrect ? '#22c55e' : isUsed ? '#ef4444' : 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Icon
+    ctx.font = '44px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'white';
+    if (isCorrect) ctx.fillText('✓', x + boxSize/2, y + boxSize/2 + 16);
+    else if (isUsed) ctx.fillText('✗', x + boxSize/2, y + boxSize/2 + 16);
+    else ctx.fillText('○', x + boxSize/2, y + boxSize/2 + 16);
+  }
+
+  // Stats row
+  const statsY = 430;
+  const statItems = [
+    { label: 'Tries', value: won ? `${lastResultTries}/3` : 'X/3' },
+    { label: 'Time', value: `${lastResultTime}s` },
+    { label: 'Streak', value: `${streak}🔥` },
+  ];
+  statItems.forEach((s, i) => {
+    const sx = 90 + i * 170;
+    ctx.font = 'bold 42px Nunito, Arial';
+    ctx.fillStyle = '#f59e0b';
+    ctx.textAlign = 'center';
+    ctx.fillText(s.value, sx + 80, statsY);
+    ctx.font = '600 22px Nunito, Arial';
+    ctx.fillStyle = '#93c5fd';
+    ctx.fillText(s.label, sx + 80, statsY + 34);
+  });
+
+  // Divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(40, 510);
+  ctx.lineTo(W - 40, 510);
+  ctx.stroke();
+
+  // Mode label
+  const modeLabel = gameMode === 'daily' ? '📅 Daily Challenge' : gameMode === 'friend' ? '👥 Friend Challenge' : '⚡ Quick Challenge';
+  ctx.font = '700 26px Nunito, Arial';
+  ctx.fillStyle = '#93c5fd';
+  ctx.textAlign = 'center';
+  ctx.fillText(modeLabel, W/2, 555);
+
+  // CTA
+  ctx.font = 'bold 30px Nunito, Arial';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('Can you beat me?', W/2, 610);
+
+  // URL pill
+  const pillW = 360, pillH = 52, pillX = (W - pillW)/2, pillY = 640;
+  ctx.beginPath();
+  roundRect(ctx, pillX, pillY, pillW, pillH, 26);
+  ctx.fillStyle = 'rgba(245,158,11,0.2)';
+  ctx.fill();
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.font = 'bold 24px Nunito, Arial';
+  ctx.fillStyle = '#f59e0b';
+  ctx.fillText('oddpebblegames.github.io/beat-me-in-3', W/2, pillY + 34);
+
+  // Bottom branding
+  ctx.font = '600 20px Nunito, Arial';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillText('Beat Me in 3 — Daily Number Challenge', W/2, 740);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+async function shareResultCard() {
+  const canvas = document.getElementById('result-canvas');
+  try {
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'beatmein3.png', { type: 'image/png' });
+      const shareUrl = 'https://oddpebblegames.github.io/beat-me-in-3';
+      const text = lastResultWon
+        ? `I guessed it in ${lastResultTries}/3 tries! Can you beat me?\n${shareUrl}`
+        : `So close! Can you do better?\n${shareUrl}`;
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: 'Beat Me in 3', text, files: [file] });
+      } else if (navigator.share) {
+        await navigator.share({ title: 'Beat Me in 3', text });
+      } else {
+        // Download the image
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'beatmein3.png';
+        a.click();
+        copyToClipboard(text);
+      }
+    }, 'image/png');
+  } catch(e) {
+    copyToClipboard('https://oddpebblegames.github.io/beat-me-in-3');
+    showToast('Link copied! 📋');
+  }
+}
+
+// Keep old shareScore for taunt flow
 function shareScore(won) {
   const tries = won ? document.getElementById('win-tries').textContent : '3';
-  const emoji = won ? Array(parseInt(tries)).fill('🟥').map((_,i) => i === parseInt(tries)-1 ? '🟩' : '🟥').join('') : '🟥🟥🟥';
+  const url = 'https://oddpebblegames.github.io/beat-me-in-3';
   const text = won
-    ? `I guessed it in ${tries}/3 tries on Beat Me in 3! ${emoji}\nCan you beat me?`
-    : `I couldn't guess it in Beat Me in 3! ${emoji}\nThe number was ${secretNumber}. Can you do better?`;
-
+    ? `I guessed it in ${tries}/3 tries on Beat Me in 3!\nCan you beat me? ${url}`
+    : `I couldn't get it on Beat Me in 3!\nThe number was ${secretNumber}. Can you do better? ${url}`;
   if (navigator.share) {
     navigator.share({ title: 'Beat Me in 3', text }).catch(() => copyToClipboard(text));
   } else {
     copyToClipboard(text);
   }
+}
+
+// === Free trial hint ===
+function getTrialHint() {
+  closeBuyHints();
+  const trialKey = `bmi3_trial_hint_${getTodayKey()}`;
+  if (localStorage.getItem(trialKey)) {
+    showToast('You already used your free hint today!');
+    return;
+  }
+  localStorage.setItem(trialKey, '1');
+  hintCount = 1;
+  updateHintBtn();
+  showToast('1 free hint added! Use it wisely 💡');
+}
+
+// === Countdown to next daily reset ===
+function updateHomeCountdown() {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  const diff = tomorrow - now;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  const el = document.getElementById('home-countdown');
+  if (el) el.textContent = `Next number in ${h}h ${m}m ${s}s`;
+}
+
+// === Today's player count on leaderboard button ===
+async function loadHomePlayerCount() {
+  if (!db) return;
+  try {
+    const { collection, getDocs, query, where } = window._fb;
+    const q = query(collection(db, 'scores'), where('date', '==', getTodayKey()));
+    const snap = await getDocs(q);
+    const count = snap.size;
+    const el = document.getElementById('home-player-count');
+    if (el && count > 0) {
+      el.textContent = `${count} playing`;
+      el.style.display = 'inline-block';
+    }
+  } catch(e) {}
 }
 
 function copyToClipboard(text) {
@@ -1826,6 +2271,19 @@ document.getElementById('home-sound-btn').textContent = soundEnabled ? '🔊' : 
 
 // Apply numpad theme on load
 window.addEventListener('load', applyNumpadTheme);
+
+// Start countdown timer
+updateHomeCountdown();
+setInterval(updateHomeCountdown, 1000);
+
+// Load player count after Firebase ready
+setTimeout(loadHomePlayerCount, 2000);
+
+// Check for incoming friend challenge in URL
+checkIncomingChallenge();
+
+// Show onboarding or home
+checkOnboarding();
 
 // Push Notifications
 async function requestPushPermission() {
