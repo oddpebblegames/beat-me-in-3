@@ -8,6 +8,12 @@
 <meta name="theme-color" content="#1a0a3c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Beat Me in 3">
+<meta name="description" content="Guess the secret number in 3 tries. Daily challenges, friend duels, global leaderboard.">
+<meta property="og:title" content="Beat Me in 3">
+<meta property="og:description" content="Guess the secret number in 3 tries. Can you beat your friends?">
+<meta property="og:image" content="https://oddpebblegames.github.io/beat-me-in-3/icon-512.png">
+<meta property="og:url" content="https://oddpebblegames.github.io/beat-me-in-3/">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -250,7 +256,8 @@
     box-shadow: 0 5px 0 #1f2937, 0 7px 14px rgba(0,0,0,0.4);
     font-size: 1.2rem;
   }
-  .numpad-btn.hint-btn {
+  .numpad-btn.hint-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #111827; }
+  .hint-btn {
     background: linear-gradient(160deg, #374151, #1f2937);
     box-shadow: 0 5px 0 #111827, 0 7px 14px rgba(0,0,0,0.4);
     opacity: 0.45; cursor: not-allowed; position: relative; font-size: 1.2rem;
@@ -497,6 +504,7 @@
   }
   .result-btn.btn-gold:active { box-shadow: 0 2px 0 var(--gold-shadow); }
 
+  .btn-home-small:active { opacity:0.7; transform:translateY(1px); }
   .btn-home-small {
     background: transparent; color: var(--text-muted); font-size: 0.9rem;
     border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; padding: 8px;
@@ -607,52 +615,6 @@
   #result-card-modal .modal { border-radius:28px; margin:20px; width:auto; }
 
   /* ---- LIGHT MODE ---- */
-  body.light-mode .app { background: radial-gradient(ellipse at 50% 0%, #c4b5fd 0%, #dbeafe 55%, #eff6ff 100%); }
-  body.light-mode .bg-orb-1 { background: #a78bfa; opacity: 0.2; }
-  body.light-mode .bg-orb-2 { background: #93c5fd; opacity: 0.2; }
-  body.light-mode .home-title { color: #1e1b4b; }
-  body.light-mode .home-title span { color: #d97706; }
-  body.light-mode .home-subtitle { color: #4c1d95; }
-  body.light-mode .menu-label { color: inherit; }
-  body.light-mode .btn-friend { background: linear-gradient(160deg,#60a5fa,#2563eb); color:white; }
-  body.light-mode .btn-daily  { background: linear-gradient(160deg,#a78bfa,#7c3aed); color:white; }
-  body.light-mode .secondary-btn { background: rgba(255,255,255,0.5); border-color: rgba(79,70,229,0.2); color: #4c1d95; }
-  body.light-mode .numpad-btn { background: linear-gradient(160deg,#c4b5fd,#a78bfa); color: #1e1b4b; box-shadow:0 5px 0 #7c3aed,0 7px 14px rgba(0,0,0,0.2); }
-  body.light-mode .hint-box { background:rgba(255,255,255,0.4); border-color:rgba(79,70,229,0.2); }
-  body.light-mode .game-title { color: #1e1b4b; }
-  body.light-mode .game-title span { color: #d97706; }
-  body.light-mode .guess-prompt { color: #4c1d95; }
-  body.light-mode .dot { border-color: rgba(124,58,237,0.4); }
-  body.light-mode .result-title { color: #1e1b4b; text-shadow:0 4px 0 rgba(0,0,0,0.15); }
-  body.light-mode .result-sub { color: #4c1d95; }
-  body.light-mode .stat-card { background:rgba(255,255,255,0.5); border-color:rgba(255,255,255,0.8); }
-  body.light-mode .stat-label { color: #4c1d95; }
-  body.light-mode .lb-row { background:rgba(255,255,255,0.4); border-color:rgba(255,255,255,0.7); }
-  body.light-mode .lb-name { color: #1e1b4b; }
-  body.light-mode .lb-rank { color: #1e1b4b; }
-  body.light-mode .lb-tries { color: #d97706; }
-  body.light-mode .lb-time { color: #4c1d95; }
-  body.light-mode .modal { background: linear-gradient(160deg,#ede9fe,#dbeafe); }
-  body.light-mode .modal h2 { color: #1e1b4b; }
-  body.light-mode .modal p  { color: #4c1d95; }
-  body.light-mode #lb-loading { color: #4c1d95; }
-  body.light-mode #home-countdown { color: #4c1d95; }
-  body.light-mode .back-btn { background:rgba(255,255,255,0.4); border-color:rgba(79,70,229,0.2); color:#1e1b4b; }
-  body.light-mode .icon-btn { background:rgba(255,255,255,0.4); border-color:rgba(79,70,229,0.2); color:#1e1b4b; }
-  body.light-mode .sound-btn { background:rgba(255,255,255,0.4); border-color:rgba(79,70,229,0.2); color:#1e1b4b; }
-  body.light-mode .challenge-label { background:rgba(217,119,6,0.1); border-color:rgba(217,119,6,0.3); }
-  body.light-mode .secondary-btn { color: #4c1d95; }
-  body.light-mode .toast { background:rgba(237,233,254,0.97); border-color:rgba(124,58,237,0.4); color:#1e1b4b; }
-  body.light-mode .streak-number { text-shadow:0 4px 0 var(--gold-shadow); }
-  body.light-mode .onboard-title { color:#1e1b4b; }
-  body.light-mode .onboard-body  { color:#4c1d95; }
-  body.light-mode .lb-tab { background:rgba(255,255,255,0.3); color:#4c1d95; }
-  body.light-mode #home-countdown { color: #4c1d95; }
-  body.light-mode .dist-label { color: #4c1d95; }
-  body.light-mode .dist-bar-bg { background:rgba(0,0,0,0.08); }
-  body.light-mode .timer-num { color: #1e1b4b; }
-  body.light-mode .hint-higher { color: #ea580c; }
-  body.light-mode .hint-lower  { color: #2563eb; }
 
   /* ---- NUMPAD THEMES ---- */
   .theme-fire .numpad-btn { background: linear-gradient(160deg,#f97316,#dc2626); box-shadow:0 5px 0 #7f1d1d,0 7px 14px rgba(0,0,0,0.4); }
@@ -666,6 +628,11 @@
   .shake { animation: shake 0.35s ease; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 
+  /* FAQ */
+  .faq-item { margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px; }
+  .faq-item:last-of-type { border-bottom:none; }
+  .faq-q { font-family:'Fredoka One',cursive; font-size:1.05rem; color:var(--gold); margin-bottom:5px; }
+  .faq-a { font-family:'Nunito',sans-serif; font-size:0.88rem; color:var(--text-muted); line-height:1.55; }
 </style>
 </head>
 <body>
@@ -692,21 +659,13 @@
     <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
       <!-- Top right controls -->
       <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;">
-        <button class="icon-btn" id="home-sound-btn" onclick="toggleSound()">🔊</button>
-        <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+        <button class="icon-btn" id="home-sound-btn" onclick="toggleSound()" title="Sound"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/><path d="M16.5 12c0-1.77-1-3.29-2.5-4.03v8.06c1.5-.74 2.5-2.26 2.5-4.03Z" fill="white" opacity="0.8"/><path d="M19 12c0-3.04-1.73-5.64-4.27-6.96l-.73 1.3A6 6 0 0 1 17 12a6 6 0 0 1-2.97 5.18l.72 1.3A7.97 7.97 0 0 0 19 12Z" fill="white" opacity="0.5"/></svg></button>
+        <button class="icon-btn" onclick="openFAQ()" title="FAQ" style="font-family:'Fredoka One',cursive;font-size:1rem;font-weight:900;color:white;">?</button>
       </div>
       <img src="icon-192.png" alt="Beat Me in 3" style="width:90px;height:90px;border-radius:22px;margin-bottom:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
       <h1 class="home-title">Beat Me in <span>3</span></h1>
       <p class="home-subtitle">Guess the number in 3 tries or less</p>
 
-      <button class="menu-btn btn-bot" onclick="startBotGame()">
-        <span class="menu-icon">⚡</span>
-        <span class="menu-label">Quick Challenge</span>
-      </button>
-      <button class="menu-btn btn-friend" onclick="showScreen('screen-friend-set')">
-        <span class="menu-icon">👥</span>
-        <span class="menu-label">Challenge a Friend</span>
-      </button>
       <button class="menu-btn btn-daily" id="daily-btn" onclick="startDailyChallenge()">
         <span id="calendar-icon" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:white;border-radius:7px;flex-shrink:0;flex-direction:column;line-height:1;overflow:hidden;">
           <span style="background:#ef4444;color:white;font-size:0.4rem;font-weight:900;width:100%;text-align:center;padding:1px 0;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" id="cal-month"></span>
@@ -715,8 +674,39 @@
         <span class="menu-label">Daily Challenge</span>
         <span id="daily-counter" style="flex-shrink:0;background:rgba(0,0,0,0.25);border-radius:20px;padding:2px 8px;font-size:0.68rem;font-weight:800;line-height:1.4;white-space:nowrap;max-width:60px;overflow:hidden;text-overflow:ellipsis;"></span>
       </button>
+      <button class="menu-btn btn-bot" onclick="startBotGame()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+  <path d="M13 2L4.5 13.5H11L10 22L20 10H13.5L13 2Z" fill="#1a0a3c" stroke="#1a0a3c" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M13 2L4.5 13.5H11L10 22L20 10H13.5L13 2Z" fill="url(#lg)" stroke="none"/>
+  <defs><linearGradient id="lg" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#fff9c4"/><stop offset="1" stop-color="#fde047"/>
+  </linearGradient></defs>
+</svg>
+        <span class="menu-label">Quick Challenge</span>
+      </button>
+      <button class="menu-btn btn-friend" onclick="showScreen('screen-friend-set')">
+        <svg width="24" height="22" viewBox="0 0 28 24" fill="none" style="flex-shrink:0">
+  <circle cx="10" cy="7" r="4.5" fill="white" opacity="0.9"/>
+  <circle cx="20" cy="7" r="4.5" fill="white" opacity="0.7"/>
+  <path d="M1 22c0-5 4-8 9-8s9 3 9 8" fill="white" opacity="0.9"/>
+  <path d="M18 15c2-1 4-1.5 5-1.5 4 0 7 2.5 7 6.5" fill="white" opacity="0.6"/>
+</svg>
+        <span class="menu-label">Challenge a Friend</span>
+      </button>
       <button class="menu-btn btn-gold" onclick="openLeaderboard()">
-        <span class="menu-icon">🏆</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+  <defs>
+    <linearGradient id="tg" x1="6" y1="3" x2="18" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#fef08a"/><stop offset="1" stop-color="#d97706"/></linearGradient>
+    <linearGradient id="tg2" x1="3" y1="5" x2="3" y2="10" gradientUnits="userSpaceOnUse"><stop stop-color="#fde047"/><stop offset="1" stop-color="#ca8a04"/></linearGradient>
+  </defs>
+  <path d="M6 3h12v8a6 6 0 0 1-12 0V3Z" fill="url(#tg)"/>
+  <path d="M3 5h3v5a3 3 0 0 1-3-3V5Z" fill="url(#tg2)" opacity="0.8"/>
+  <path d="M21 5h-3v5a3 3 0 0 0 3-3V5Z" fill="url(#tg2)" opacity="0.8"/>
+  <rect x="9" y="17" width="6" height="3" rx="1" fill="url(#tg)"/>
+  <rect x="7" y="20" width="10" height="2" rx="1" fill="url(#tg)"/>
+  <circle cx="12" cy="8" r="2" fill="rgba(255,255,255,0.5)"/>
+
+</svg>
         <span class="menu-label">Leaderboard</span>
         <span id="home-player-count" style="flex-shrink:0;background:rgba(0,0,0,0.2);border-radius:20px;padding:3px 10px;font-size:0.72rem;font-weight:800;line-height:1;display:none;"></span>
       </button>
@@ -725,8 +715,19 @@
       <div id="home-countdown" style="color:var(--text-muted);font-size:0.8rem;font-weight:700;font-family:'Nunito',sans-serif;margin-top:-8px;margin-bottom:8px;letter-spacing:0.3px;"></div>
 
       <div style="display:flex;gap:10px;width:100%;max-width:300px;margin-top:0;">
-        <button class="secondary-btn" onclick="showStreak()">🔥 Streak</button>
-        <button class="secondary-btn" onclick="showStats()">📊 My Stats</button>
+        <button class="secondary-btn" onclick="showStreak()" style="display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="18" height="22" viewBox="0 0 20 26" fill="none" style="flex-shrink:0">
+  <path d="M10 1C10 1 16 7 16 13a6 6 0 0 1-12 0C4 9 7 6 7 6s-1 4 2 6c0 0 1-5 5-8-1 3-1 6 1 7 0-4 3-6 3-10z" fill="url(#fg)"/>
+  <path d="M10 16c0 2-1.5 3-1.5 3s3 0 3-3c0-1.5-1.5-1.5-1.5 0z" fill="white" opacity="0.6"/>
+  <defs><linearGradient id="fg" x1="4" y1="26" x2="16" y2="1" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#dc2626"/><stop offset="0.5" stop-color="#f97316"/><stop offset="1" stop-color="#fde047"/>
+  </linearGradient></defs>
+</svg><span>Streak</span></button>
+        <button class="secondary-btn" onclick="showStats()" style="display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+  <rect x="2" y="14" width="5" height="8" rx="2" fill="#818cf8"/>
+  <rect x="9.5" y="9" width="5" height="13" rx="2" fill="#a78bfa"/>
+  <rect x="17" y="4" width="5" height="18" rx="2" fill="#c4b5fd"/>
+  <path d="M3 20 L8 14 L12 16 L19 8" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+</svg><span>My Stats</span></button>
       </div>
     </div>
   </div>
@@ -734,7 +735,11 @@
   <!-- GAMEPLAY SCREEN (vs Bot) -->
   <div class="screen" id="screen-game">
     <button class="back-btn" onclick="goHome()">←</button>
-    <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔊</button>
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()" title="Sound"><svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+  <path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/>
+  <path d="M16.5 12c0-1.77-1-3.29-2.5-4.03v8.06c1.5-.74 2.5-2.26 2.5-4.03Z" fill="white" opacity="0.8"/>
+  <path d="M19 12c0-3.04-1.73-5.64-4.27-6.96l-.73 1.3A6 6 0 0 1 17 12a6 6 0 0 1-2.97 5.18l.72 1.3A7.97 7.97 0 0 0 19 12Z" fill="white" opacity="0.5"/>
+</svg></button>
     <div class="game-header">
       <div class="game-title">Beat Me in <span>3</span></div>
     </div>
@@ -775,14 +780,17 @@
   <!-- FRIEND SET NUMBER SCREEN -->
   <div class="screen" id="screen-friend-set">
     <button class="back-btn" onclick="showScreen('screen-home')">←</button>
-    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
-      <p class="set-number-title">Set a number (0–9)</p>
-      <p class="set-number-sub">Your friend will try to guess it in 3 tries</p>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:0;">
 
-      <div class="number-picker">
-        <button class="picker-btn" onclick="changePickerNum(-1)">‹</button>
-        <div class="picker-number" id="picker-display">5</div>
+      <div class="result-icon" style="font-size:3rem;margin-bottom:0;">👥</div>
+      <div class="home-title" style="font-size:1.8rem;margin-top:8px;margin-bottom:4px;">Challenge a Friend</div>
+      <p style="color:var(--text-muted);font-size:0.95rem;font-weight:600;margin-bottom:28px;text-align:center;">Pick a number — your friend has 3 tries to guess it</p>
+
+      <!-- Number picker -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:28px;">
         <button class="picker-btn" onclick="changePickerNum(1)">›</button>
+        <div class="picker-display" id="picker-display">5</div>
+        <button class="picker-btn" onclick="changePickerNum(-1)">‹</button>
       </div>
 
       <button class="create-challenge-btn" onclick="createFriendChallenge()">Create Challenge</button>
@@ -790,14 +798,14 @@
       <!-- Share link area — shown after challenge created -->
       <div id="challenge-link-box" style="display:none;width:100%;max-width:300px;margin-top:16px;">
         <div style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px;margin-bottom:10px;">
-          <div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;margin-bottom:6px;font-family:'Nunito',sans-serif;">CHALLENGE LINK</div>
-          <div id="challenge-link-text" style="color:white;font-size:0.85rem;font-weight:700;font-family:'Nunito',sans-serif;word-break:break-all;"></div>
+          <div style="color:var(--text-muted);font-size:0.75rem;font-weight:700;margin-bottom:6px;font-family:'Nunito',sans-serif;text-align:center;letter-spacing:1px;">CHALLENGE LINK</div>
+          <div id="challenge-link-text" style="color:white;font-size:0.85rem;font-weight:700;font-family:'Nunito',sans-serif;word-break:break-all;text-align:center;"></div>
         </div>
-        <button class="create-challenge-btn" style="margin-top:0;background:linear-gradient(135deg,#22c55e,#16a34a);" onclick="shareFriendChallenge()">Send to Friend</button>
-        <button class="create-challenge-btn" style="margin-top:10px;" onclick="playFriendChallenge()">Play on This Device</button>
+        <button class="create-challenge-btn" style="margin-top:0;background:linear-gradient(160deg,#4ade80,#22c55e);box-shadow:0 6px 0 #14532d;" onclick="shareFriendChallenge()">📤 Send to Friend</button>
+        <button class="create-challenge-btn" style="margin-top:10px;background:linear-gradient(160deg,#60a5fa,#3b82f6);box-shadow:0 6px 0 #1e3a8a;" onclick="playFriendChallenge()">Play on This Device</button>
       </div>
 
-      <p class="share-hint" id="share-hint-text">Your friend will try to guess your number!</p>
+      <p id="share-hint-text" style="color:var(--text-muted);font-size:0.85rem;font-weight:600;margin-top:16px;text-align:center;">Your friend will try to guess your number!</p>
     </div>
   </div>
 
@@ -829,10 +837,10 @@
   <!-- WIN SCREEN -->
   <div class="screen result-screen" id="screen-win">
     <div class="confetti-container" id="confetti"></div>
-    <div class="result-icon">🎉</div>
-    <div class="result-title">You Got It!</div>
+    <div class="result-icon" id="win-icon">🎉</div>
+    <div class="result-title" id="win-title">You Got It!</div>
     <p class="result-sub" id="win-sub">You guessed it in <u id="win-tries">1</u> tr<span id="win-try-word">y</span>!</p>
-    <button class="result-btn btn-share" onclick="showResultCard(true)">Share Your Score</button>
+    <button class="result-btn btn-share" onclick="showResultCard(true)">📸 Share Your Score</button>
     <button class="result-btn btn-taunt" id="taunt-btn-win" style="display:none;" onclick="showTaunt()">Send a Taunt</button>
     <button class="result-btn" id="challenge-back-btn-win" style="display:none;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;" onclick="challengeBack()">Challenge Them Back!</button>
     <button class="result-btn btn-gold" id="lb-btn-win" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
@@ -843,9 +851,9 @@
   <!-- LOSE SCREEN -->
   <div class="screen result-screen" id="screen-lose">
     <div class="result-icon">😅</div>
-    <div class="result-title">You Lost!</div>
+    <div class="result-title">Not This Time!</div>
     <p class="result-sub">The number was <u id="lose-number" style="color:var(--gold);">?</u></p>
-    <button class="result-btn btn-share" onclick="showResultCard(false)">Share Your Score</button>
+    <button class="result-btn btn-share" onclick="showResultCard(false)">📸 Share Score</button>
     <button class="result-btn" id="challenge-back-btn-lose" style="display:none;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;" onclick="challengeBack()">Challenge Them Back!</button>
     <button class="result-btn btn-gold" id="lb-btn-lose" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
@@ -884,7 +892,7 @@
         <button class="modal-close" style="background:linear-gradient(135deg,#22c55e,#16a34a);padding:14px;" onclick="buyMatches(5)">5 Matches — $0.99</button>
         <button class="modal-close" style="background:linear-gradient(135deg,#22c55e,#16a34a);padding:14px;" onclick="buyMatches(20)">20 Matches — $2.99 <span style="color:#f59e0b;font-size:0.8rem;">BEST VALUE</span></button>
       </div>
-      <button class="modal-close" style="background:#374151;" onclick="document.getElementById('buy-matches-modal').classList.remove('active')">Maybe Later</button>
+      <button class="modal-close" style="background:#374151;" onclick="closeBuyMatches()">Maybe Later</button>
     </div>
   </div>
 
@@ -894,7 +902,7 @@
       <h2>Send a Taunt</h2>
       <p>Challenge your friend with a message!</p>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;" id="taunt-list"></div>
-      <button class="modal-close" style="background:#374151;" onclick="document.getElementById('taunt-modal').classList.remove('active')">Skip</button>
+      <button class="modal-close" style="background:#374151;" onclick="closeTaunt()">Skip</button>
     </div>
   </div>
 
@@ -912,7 +920,7 @@
         <div class="onboard-slide" id="slide-1" style="display:none;">
           <div class="onboard-icon">📅</div>
           <div class="onboard-title">Play Every Day</div>
-          <div class="onboard-body">Everyone gets the <strong>same number</strong> in Daily Challenge. Compete on the global leaderboard. Build your streak. Come back tomorrow for a new number.</div>
+          <div class="onboard-body">Play up to <strong>10 matches</strong> a day in Daily Challenge. Your total tries is your score — lowest wins. Compete on the global leaderboard and build your streak!</div>
         </div>
 
         <div class="onboard-slide" id="slide-2" style="display:none;">
@@ -941,7 +949,7 @@
       <canvas id="result-canvas" width="680" height="780" style="width:100%;display:block;border-radius:24px 24px 0 0;"></canvas>
       <div style="display:flex;gap:8px;padding:14px;background:#1a3fa8;">
         <button onclick="shareResultCard()" style="flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">Share</button>
-        <button onclick="document.getElementById('result-card-modal').classList.remove('active')" style="padding:14px 18px;border-radius:12px;border:none;background:rgba(255,255,255,0.15);color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">Close</button>
+        <button onclick="closeResultCard()" style="padding:14px 18px;border-radius:12px;border:none;background:rgba(255,255,255,0.15);color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">Close</button>
       </div>
     </div>
   </div>
@@ -1019,7 +1027,7 @@ let db = null;
     const app = initializeApp(firebaseConfig);
     db = getFirestore(app);
     window._fb = { collection, doc, setDoc, getDocs, query, where, orderBy, getDoc };
-    console.log('Firebase ready!');
+
   } catch(e) { console.error('Firebase init failed:', e); }
 })();
 
@@ -1231,8 +1239,21 @@ let bgmPlaying = false;
 
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
+
+// Pre-warm AudioContext on first user interaction — kills the first-sound lag
+function warmAudio() {
+  const ctx = getAudioCtx();
+  const buf = ctx.createBuffer(1, 1, ctx.sampleRate);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.connect(ctx.destination);
+  src.start(0);
+}
+document.addEventListener('touchstart', warmAudio, { once: true });
+document.addEventListener('mousedown', warmAudio, { once: true });
 
 function playTone(freq, type, duration, vol=0.3, delay=0) {
   if (!soundEnabled) return;
@@ -1255,10 +1276,10 @@ function sfxWrong() {
   playTone(150, 'sawtooth', 0.2, 0.2, 0.15);
 }
 function sfxWin() {
-  // Fanfare melody
-  [523,659,784,1047].forEach((f,i) => playTone(f, 'sine', 0.3, 0.3, i*0.1));
-  // Crowd applause simulation — bursts of noise
-  setTimeout(() => sfxApplause(), 500);
+  // Fanfare melody — plays immediately via Web Audio scheduler (no setTimeout lag)
+  [523,659,784,1047].forEach((f,i) => playTone(f, 'sine', 0.35, 0.35, i*0.12));
+  // Applause starts right away, overlapping with fanfare
+  sfxApplause();
 }
 
 function sfxApplause() {
@@ -1286,10 +1307,10 @@ function sfxApplause() {
 }
 
 function sfxLose() {
-  // Sad trombone
+  // Sad trombone — descending, scheduled ahead via Web Audio
   [300, 250, 200, 150].forEach((f,i) => playTone(f, 'sawtooth', 0.3, 0.25, i*0.15));
-  // Crowd awww — low groan with noise
-  setTimeout(() => sfxCrowdGroan(), 400);
+  // Crowd groan starts immediately underneath the trombone
+  sfxCrowdGroan();
 }
 
 function sfxCrowdGroan() {
@@ -1359,10 +1380,10 @@ function stopBGM() {
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
-  const icon = soundEnabled ? '🔊' : '🔇';
-  document.getElementById('sound-btn').textContent = icon;
+  const svg = soundEnabled ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/><path d="M16.5 12c0-1.77-1-3.29-2.5-4.03v8.06c1.5-.74 2.5-2.26 2.5-4.03Z" fill="white" opacity="0.8"/><path d="M19 12c0-3.04-1.73-5.64-4.27-6.96l-.73 1.3A6 6 0 0 1 17 12a6 6 0 0 1-2.97 5.18l.72 1.3A7.97 7.97 0 0 0 19 12Z" fill="white" opacity="0.5"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/><line x1="23" y1="9" x2="17" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="17" y1="9" x2="23" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>';
+  document.getElementById('sound-btn').innerHTML = svg;
   const homeBtn = document.getElementById('home-sound-btn');
-  if (homeBtn) homeBtn.textContent = icon;
+  if (homeBtn) homeBtn.innerHTML = svg;
   if (soundEnabled) startBGM(); else stopBGM();
 }
 
@@ -1375,11 +1396,15 @@ function startTimer() {
   clearInterval(timerInterval);
   timeLeft = TIMER_DURATION;
   updateTimerUI();
+  // Use performance.now() based timer to avoid drift
+  const started = performance.now();
   timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerUI();
+    const elapsed = (performance.now() - started) / 1000;
+    timeLeft = Math.max(0, TIMER_DURATION - Math.floor(elapsed));
+    // Play sound BEFORE UI update so it feels simultaneous
     if (timeLeft <= 5) sfxUrgent();
     else if (timeLeft <= 10) sfxTick();
+    updateTimerUI();
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       timeExpired();
@@ -1440,9 +1465,9 @@ function startCountdown(callback) {
     void numEl.offsetWidth;
     numEl.style.animation = '';
 
-    // Play tick sound
-    if (steps[i] !== 'Go!') playTone(660 - i * 80, 'sine', 0.15, 0.4);
-    else playTone(880, 'sine', 0.2, 0.5);
+    // Play tick sound simultaneously with visual (Web Audio schedules ahead, no lag)
+    if (steps[i] !== 'Go!') playTone(700 - i * 60, 'sine', 0.18, 0.5);
+    else { playTone(880, 'sine', 0.12, 0.5); playTone(1100, 'sine', 0.15, 0.5, 0.1); }
 
     i++;
     if (i < steps.length) {
@@ -1685,7 +1710,13 @@ function showWin(tries) {
     const againBtn = document.querySelector('#screen-win .btn-again');
     if (againBtn) { againBtn.textContent = 'Play Again'; againBtn.onclick = startBotGame; }
   }
-  spawnConfetti();
+  // Set win icon based on tries — make it feel earned
+  const winIcon = document.getElementById('win-icon');
+  const winTitle = document.getElementById('win-title');
+  if (winIcon) winIcon.textContent = tries === 1 ? '🏆' : tries === 2 ? '🎯' : '✅';
+  if (winTitle) winTitle.textContent = tries === 1 ? 'First Try!!' : tries === 2 ? 'Got It!' : 'Just Made It!';
+  // Small delay so sfxWin fires first (sound leads, visuals follow)
+  setTimeout(() => spawnConfetti(), 80);
   // Ask for notifications after first win — user is happy, best time to ask!
   const totalWins = JSON.parse(localStorage.getItem('bmi3_stats') || '{}').wins || 0;
   if (totalWins === 1) setTimeout(requestNotificationPermission, 2000);
@@ -1937,17 +1968,6 @@ function showStats() {
 }
 
 // === Dark/Light Mode ===
-let isLightMode = localStorage.getItem('bmi3_theme') === 'light';
-function applyTheme() {
-  document.body.classList.toggle('light-mode', isLightMode);
-  document.getElementById('theme-btn').textContent = isLightMode ? '☀️' : '🌙';
-}
-function toggleTheme() {
-  isLightMode = !isLightMode;
-  localStorage.setItem('bmi3_theme', isLightMode ? 'light' : 'dark');
-  applyTheme();
-}
-applyTheme();
 
 // === Numpad Themes ===
 const THEMES = ['default', 'fire', 'purple', 'gold'];
@@ -1979,19 +1999,19 @@ function getFlagEmoji(countryCode) {
 
 // === Taunt Messages ===
 const TAUNTS = [
-  "Bet you can't guess mine! 😏",
-  "I got it in ${tries} tries. Your turn! 🎯",
-  "Easy peasy! Can you beat ${tries}/3? 😎",
-  "Too slow! I got it in ${tries}! ⚡",
-  "Challenge accepted? I scored ${tries}/3 🏆",
-  "Your brain vs mine. Go! 🧠"
+  { text: "Bet you can't guess mine! 😏", useTries: false },
+  { text: "I got it in TRIES tries. Your turn! 🎯", useTries: true },
+  { text: "Easy peasy! Can you beat TRIES/3? 😎", useTries: true },
+  { text: "Too slow! I got it in TRIES! ⚡", useTries: true },
+  { text: "Challenge accepted? I scored TRIES/3 🏆", useTries: true },
+  { text: "Your brain vs mine. Go! 🧠", useTries: false }
 ];
 
 function showTaunt() {
   const tries = document.getElementById('win-tries').textContent;
   const list = document.getElementById('taunt-list');
   list.innerHTML = TAUNTS.map(t => {
-    const msg = t.replace('${tries}', tries);
+    const msg = t.useTries ? t.text.replace('TRIES', tries) : t.text;
     return `<button class="modal-close" style="background:rgba(255,255,255,0.1);color:white;font-size:0.9rem;padding:12px;text-align:left;" onclick="sendTaunt(\`${msg}\`)">${msg}</button>`;
   }).join('');
   document.getElementById('taunt-modal').classList.add('active');
@@ -2142,7 +2162,7 @@ function checkIncomingChallenge() {
         setTimeout(() => launchPendingChallenge(), 600);
       }
     }
-  } catch(e) { console.log('No challenge in URL'); }
+  } catch(e) {  }
 }
 
 function launchPendingChallenge() {
@@ -2345,7 +2365,7 @@ document.getElementById('cal-day').textContent = _now.getDate();
 updateDailyCounter();
 
 // Sync home sound button
-document.getElementById('home-sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+// Sound button initialized via SVG in HTML
 
 // Apply numpad theme on load
 window.addEventListener('load', applyNumpadTheme);
@@ -2371,14 +2391,14 @@ async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   try {
     swRegistration = await navigator.serviceWorker.register('/beat-me-in-3/sw.js');
-    console.log('SW registered');
+
     // Check pending notifications on SW activation
     swRegistration.addEventListener('updatefound', () => {
       swRegistration.installing.addEventListener('statechange', e => {
         if (e.target.state === 'activated') checkPendingNotifFromPage();
       });
     });
-  } catch(e) { console.log('SW registration failed:', e); }
+  } catch(e) { console.error('SW failed:', e); }
 }
 
 // Ask for permission — called after first win (much better acceptance rate)
@@ -2449,6 +2469,63 @@ document.getElementById('username-modal').addEventListener('click', function(e) 
 document.getElementById('username-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveUsername();
 });
+
+function openFAQ() {
+  sfxClick();
+  document.getElementById('faq-modal').classList.add('active');
+}
+function closeFAQ() {
+  document.getElementById('faq-modal').classList.remove('active');
+}
+document.getElementById('faq-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeFAQ();
+});
+
+function closeBuyMatches() { document.getElementById('buy-matches-modal').classList.remove('active'); }
+function closeTaunt() { document.getElementById('taunt-modal').classList.remove('active'); }
+function closeResultCard() { document.getElementById('result-card-modal').classList.remove('active'); }
 </script>
+
+  <!-- FAQ MODAL -->
+  <div class="modal-overlay" id="faq-modal">
+    <div class="modal" style="max-height:80vh;overflow-y:auto;text-align:left;">
+      <h2 style="text-align:center;margin-bottom:20px;">❓ FAQ</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I play?</div>
+        <div class="faq-a">Pick a number between 0–9. You have 3 tries and 15 seconds per try. After each guess you'll see if the secret number is higher or lower.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the Daily Challenge?</div>
+        <div class="faq-a">You get 10 matches per day. Your total tries across all matches is your daily score — lower is better. Compete on the global leaderboard!</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What's the best strategy?</div>
+        <div class="faq-a">Start with 4 or 5 — they're in the middle. If told "higher", try 7. If "lower", try 2. Binary search style gets you there in 1–2 tries most of the time.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How does Friend Challenge work?</div>
+        <div class="faq-a">Pick a secret number, tap "Create Challenge", then share the link. Your friend opens it and tries to guess your number in 3 tries!</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens if time runs out?</div>
+        <div class="faq-a">That try is wasted — you lose one of your 3 attempts. The timer resets for your next try.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How is the leaderboard scored?</div>
+        <div class="faq-a">Daily: lowest total tries across 10 matches wins. Ties broken by total time. Quick &amp; Friend: ranked by total wins all time.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I play without internet?</div>
+        <div class="faq-a">Yes! Quick Challenge and Friend Challenge work offline. Daily leaderboard needs a connection to submit your score.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">My streak disappeared — what happened?</div>
+        <div class="faq-a">Streaks are stored on your device. Clearing browser data or switching devices will reset it. Play at least once a day to keep it alive!</div>
+      </div>
+
+      <button class="modal-close" onclick="closeFAQ()" style="margin-top:8px;">Got it!</button>
+    </div>
+  </div>
 </body>
 </html>
