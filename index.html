@@ -104,20 +104,23 @@
   .menu-btn {
     width: 100%;
     max-width: 300px;
-    padding: 18px 24px;
+    padding: 0 20px;
+    height: 64px;
     border-radius: 16px;
     border: none;
     cursor: pointer;
     font-family: 'Nunito', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 800;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 12px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     transition: transform 0.12s, box-shadow 0.12s;
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .menu-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
   .btn-bot { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1a1a; }
@@ -163,8 +166,8 @@
   .icon-btn:active { background: rgba(255,255,255,0.2); }
 
   /* Menu icon — consistent size across all menu buttons */
-  .menu-icon { font-size: 1.3rem; flex-shrink: 0; }
-  .menu-label { flex: 1; text-align: left; }
+  .menu-icon { font-size: 1.3rem; flex-shrink: 0; width: 32px; text-align: center; }
+  .menu-label { flex: 1; text-align: left; font-size: 1.1rem; font-weight: 800; font-family: 'Nunito', sans-serif; }
 
   .bot-icon { font-size: 1.6rem; }
 
@@ -422,6 +425,21 @@
   body.light-mode .home-title { color: #1e3a8a; }
   body.light-mode .home-title span { color: #d97706; }
   body.light-mode .home-subtitle { color: #1d4ed8; }
+
+  /* Home buttons in light mode */
+  body.light-mode .btn-bot { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a1a1a; }
+  body.light-mode .btn-bot .menu-icon,
+  body.light-mode .btn-bot .menu-label { color: #1a1a1a; }
+  body.light-mode .btn-friend { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
+  body.light-mode .btn-friend .menu-icon,
+  body.light-mode .btn-friend .menu-label { color: white; }
+  body.light-mode .btn-daily { background: linear-gradient(135deg, #1d4ed8, #1e3a8a); color: white; border-color: #3b82f6; }
+  body.light-mode .btn-daily .menu-label { color: white; }
+  body.light-mode .btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a1a1a; }
+  body.light-mode .btn-gold .menu-icon,
+  body.light-mode .btn-gold .menu-label { color: #1a1a1a; }
+  body.light-mode .secondary-btn { background: rgba(255,255,255,0.5); border-color: rgba(30,58,138,0.3); color: #1e3a8a; }
+
   body.light-mode .numpad-btn { background: linear-gradient(145deg, #bfdbfe, #93c5fd); color: #1e3a8a; box-shadow: 0 4px 0 #60a5fa; }
   body.light-mode .hint-box { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
   body.light-mode .game-title { color: #1e3a8a; }
@@ -434,8 +452,13 @@
   body.light-mode .stat-label { color: #1d4ed8; }
   body.light-mode .lb-row { background: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.7); }
   body.light-mode .lb-name { color: #1e3a8a; }
+  body.light-mode .lb-rank { color: #1e3a8a; }
+  body.light-mode .lb-tries { color: #1e3a8a; }
+  body.light-mode .lb-time { color: #1d4ed8; }
   body.light-mode .modal { background: linear-gradient(145deg, #dbeafe, #bfdbfe); }
   body.light-mode .modal h2 { color: #1e3a8a; }
+  body.light-mode .modal p { color: #1d4ed8; }
+  body.light-mode #lb-loading { color: #1d4ed8; }
 
   /* ---- NUMPAD THEMES ---- */
   .theme-fire .numpad-btn { background: linear-gradient(145deg, #ef4444, #dc2626); }
@@ -753,19 +776,17 @@
         <span class="menu-label">Challenge a Friend</span>
       </button>
       <button class="menu-btn btn-daily" id="daily-btn" onclick="startDailyChallenge()">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
-          <span id="calendar-icon" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:white;border-radius:8px;flex-direction:column;line-height:1;overflow:hidden;">
-            <span style="background:#ef4444;color:white;font-size:0.45rem;font-weight:900;width:100%;text-align:center;padding:1px 0;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" id="cal-month"></span>
-            <span style="color:#1a1a1a;font-size:0.85rem;font-weight:900;font-family:'Nunito',sans-serif;" id="cal-day"></span>
-          </span>
-          <span id="daily-counter" style="background:rgba(0,0,0,0.25);border-radius:20px;padding:1px 8px;font-size:0.65rem;font-weight:800;white-space:nowrap;"></span>
-        </div>
+        <span id="calendar-icon" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:white;border-radius:7px;flex-shrink:0;flex-direction:column;line-height:1;overflow:hidden;">
+          <span style="background:#ef4444;color:white;font-size:0.4rem;font-weight:900;width:100%;text-align:center;padding:1px 0;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" id="cal-month"></span>
+          <span style="color:#1a1a1a;font-size:0.8rem;font-weight:900;font-family:'Nunito',sans-serif;" id="cal-day"></span>
+        </span>
         <span class="menu-label">Daily Challenge</span>
+        <span id="daily-counter" style="flex-shrink:0;background:rgba(0,0,0,0.25);border-radius:20px;padding:2px 8px;font-size:0.68rem;font-weight:800;line-height:1.4;white-space:nowrap;max-width:60px;overflow:hidden;text-overflow:ellipsis;"></span>
       </button>
       <button class="menu-btn btn-gold" onclick="openLeaderboard()">
         <span class="menu-icon">🏆</span>
         <span class="menu-label">Leaderboard</span>
-        <span id="home-player-count" style="margin-left:auto;background:rgba(0,0,0,0.2);border-radius:20px;padding:2px 10px;font-size:0.78rem;font-weight:800;display:none;"></span>
+        <span id="home-player-count" style="flex-shrink:0;background:rgba(0,0,0,0.2);border-radius:20px;padding:3px 10px;font-size:0.72rem;font-weight:800;line-height:1;display:none;"></span>
       </button>
 
       <!-- Next reset countdown -->
