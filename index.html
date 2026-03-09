@@ -72,6 +72,12 @@
     animation: fadeIn 0.3s ease;
   }
   .screen.active { display: flex; }
+  #screen-home {
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
   /* ---- HOME SCREEN ---- */
@@ -451,6 +457,15 @@
   .onboard-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.25); transition:all 0.3s; }
   .onboard-dot.active { background:var(--gold); width:28px; border-radius:5px; }
 
+  /* ---- LEADERBOARD TABS ---- */
+  .lb-tab {
+    flex: 1; padding: 9px 6px; border-radius: 12px; border: none;
+    font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800;
+    cursor: pointer; background: rgba(255,255,255,0.08); color: #93c5fd;
+    transition: all 0.15s;
+  }
+  .lb-tab-active { background: linear-gradient(135deg,#f59e0b,#d97706) !important; color: #1a1a1a !important; }
+
   /* ---- LEADERBOARD ---- */
   .lb-row {
     display: flex;
@@ -538,8 +553,13 @@
 
   /* ---- WIN / LOSE SCREENS ---- */
   .result-screen {
-    justify-content: center;
+    justify-content: flex-start;
     text-align: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-top: 20px;
+    padding-bottom: 32px;
+    gap: 0;
   }
 
   .confetti-container {
@@ -557,38 +577,38 @@
     to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
 
-  .result-icon { font-size: 5rem; margin-bottom: 16px; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .result-icon { font-size: 3.5rem; margin-bottom: 8px; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
   @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
 
   .result-title {
     font-family: 'Nunito', sans-serif;
-    font-size: 3.2rem;
+    font-size: 2.6rem;
     font-weight: 900;
     color: white;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
     text-shadow: 0 2px 20px rgba(0,0,0,0.4);
     animation: pop 0.4s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
   }
 
   .result-sub {
     color: #93c5fd;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    margin-bottom: 40px;
+    margin-bottom: 16px;
   }
   .result-sub u { color: white; text-decoration: underline; text-decoration-color: var(--gold); }
 
   .result-btn {
     width: 100%;
     max-width: 300px;
-    padding: 18px;
+    padding: 14px;
     border-radius: 16px;
     border: none;
     font-family: 'Nunito', sans-serif;
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     transition: transform 0.1s;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   }
@@ -733,12 +753,14 @@
         <span class="menu-label">Challenge a Friend</span>
       </button>
       <button class="menu-btn btn-daily" id="daily-btn" onclick="startDailyChallenge()">
-        <span id="calendar-icon" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:white;border-radius:8px;flex-shrink:0;flex-direction:column;line-height:1;overflow:hidden;">
-          <span style="background:#ef4444;color:white;font-size:0.45rem;font-weight:900;width:100%;text-align:center;padding:1px 0;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" id="cal-month"></span>
-          <span style="color:#1a1a1a;font-size:0.85rem;font-weight:900;font-family:'Nunito',sans-serif;" id="cal-day"></span>
-        </span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+          <span id="calendar-icon" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:white;border-radius:8px;flex-direction:column;line-height:1;overflow:hidden;">
+            <span style="background:#ef4444;color:white;font-size:0.45rem;font-weight:900;width:100%;text-align:center;padding:1px 0;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" id="cal-month"></span>
+            <span style="color:#1a1a1a;font-size:0.85rem;font-weight:900;font-family:'Nunito',sans-serif;" id="cal-day"></span>
+          </span>
+          <span id="daily-counter" style="background:rgba(0,0,0,0.25);border-radius:20px;padding:1px 8px;font-size:0.65rem;font-weight:800;white-space:nowrap;"></span>
+        </div>
         <span class="menu-label">Daily Challenge</span>
-        <span id="daily-counter" style="margin-left:auto;background:rgba(0,0,0,0.2);border-radius:20px;padding:2px 10px;font-size:0.78rem;font-weight:800;"></span>
       </button>
       <button class="menu-btn btn-gold" onclick="openLeaderboard()">
         <span class="menu-icon">🏆</span>
@@ -835,14 +857,18 @@
         <div id="lb-date" style="color:#93c5fd;font-size:0.85rem;font-weight:600;margin-bottom:12px;"></div>
       </div>
 
-      <!-- Tabs -->
-      <div style="display:flex;gap:8px;padding:0 16px;margin-bottom:14px;">
-        <button id="tab-today" onclick="switchLbTab('today')" style="flex:1;padding:10px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;">Today</button>
-        <button id="tab-alltime" onclick="switchLbTab('alltime')" style="flex:1;padding:10px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;background:rgba(255,255,255,0.1);color:#93c5fd;">All Time</button>
+      <!-- Tabs - 2 rows -->
+      <div style="display:flex;gap:6px;padding:0 12px;margin-bottom:6px;">
+        <button id="tab-today" onclick="switchLbTab('today')" class="lb-tab lb-tab-active">📅 Daily</button>
+        <button id="tab-alltime" onclick="switchLbTab('alltime')" class="lb-tab">🏆 All Time</button>
+      </div>
+      <div style="display:flex;gap:6px;padding:0 12px;margin-bottom:14px;">
+        <button id="tab-quick" onclick="switchLbTab('quick')" class="lb-tab">⚡ Quick</button>
+        <button id="tab-friend" onclick="switchLbTab('friend')" class="lb-tab">👥 Friends</button>
       </div>
 
       <div id="lb-loading" style="text-align:center;color:#93c5fd;padding:40px;font-weight:700;font-family:'Nunito',sans-serif;">Loading scores...</div>
-      <div id="lb-table" style="display:none;width:100%;padding:0 8px;overflow-y:auto;max-height:60dvh;"></div>
+      <div id="lb-table" style="display:none;width:100%;padding:0 8px;overflow-y:auto;max-height:55dvh;"></div>
       <div id="lb-my-row" style="display:none;padding:0 8px;margin-top:8px;"></div>
     </div>
   </div>
@@ -855,6 +881,7 @@
     <p class="result-sub" id="win-sub">You guessed it in <u id="win-tries">1</u> tr<span id="win-try-word">y</span>!</p>
     <button class="result-btn btn-share" onclick="showResultCard(true)">Share Your Score</button>
     <button class="result-btn btn-taunt" id="taunt-btn-win" style="display:none;" onclick="showTaunt()">Send a Taunt</button>
+    <button class="result-btn" id="challenge-back-btn-win" style="display:none;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;" onclick="challengeBack()">Challenge Them Back!</button>
     <button class="result-btn btn-gold" id="lb-btn-win" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
     <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
@@ -866,6 +893,7 @@
     <div class="result-title">You Lost!</div>
     <p class="result-sub">The number was <u id="lose-number" style="color:var(--gold);">?</u></p>
     <button class="result-btn btn-share" onclick="showResultCard(false)">Share Your Score</button>
+    <button class="result-btn" id="challenge-back-btn-lose" style="display:none;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;" onclick="challengeBack()">Challenge Them Back!</button>
     <button class="result-btn btn-gold" id="lb-btn-lose" style="display:none;" onclick="openLeaderboard()">See Leaderboard</button>
     <button class="result-btn btn-again" onclick="startBotGame()">Play Again</button>
     <button class="btn-home-small" onclick="showScreen('screen-home')">← Home</button>
@@ -1108,19 +1136,27 @@ async function submitDailyScore(tries, won) {
   } catch(e) { console.error('Score submit error:', e); }
 }
 
-let currentLbTab = 'today';
+async function submitModeWin(mode) {
+  if (!myUsername || !db) return;
+  const { doc, setDoc, getDoc } = window._fb;
+  const collName = mode === 'quick' ? 'wins_quick' : 'wins_friend';
+  const ref = doc(db, collName, myUsername.replace(/\s+/g,'_'));
+  try {
+    const existing = await getDoc(ref);
+    const flag = await getCountryFlag();
+    const wins = existing.exists() ? (existing.data().wins || 0) + 1 : 1;
+    await setDoc(ref, { name: myUsername, wins, flag, timestamp: Date.now() });
+  } catch(e) { console.error('Mode win submit error:', e); }
+}
 
 function switchLbTab(tab) {
   currentLbTab = tab;
-  const todayBtn = document.getElementById('tab-today');
-  const alltimeBtn = document.getElementById('tab-alltime');
-  if (tab === 'today') {
-    todayBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)'; todayBtn.style.color = '#1a1a1a';
-    alltimeBtn.style.background = 'rgba(255,255,255,0.1)'; alltimeBtn.style.color = '#93c5fd';
-  } else {
-    alltimeBtn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)'; alltimeBtn.style.color = '#1a1a1a';
-    todayBtn.style.background = 'rgba(255,255,255,0.1)'; todayBtn.style.color = '#93c5fd';
-  }
+  ['today','alltime','quick','friend'].forEach(t => {
+    const btn = document.getElementById(`tab-${t}`);
+    if (btn) {
+      btn.classList.toggle('lb-tab-active', t === tab);
+    }
+  });
   loadLeaderboard(tab);
 }
 
@@ -1128,11 +1164,7 @@ async function openLeaderboard() {
   currentLbTab = 'today';
   showScreen('screen-leaderboard');
   document.getElementById('lb-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
-  document.getElementById('tab-today').style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
-  document.getElementById('tab-today').style.color = '#1a1a1a';
-  document.getElementById('tab-alltime').style.background = 'rgba(255,255,255,0.1)';
-  document.getElementById('tab-alltime').style.color = '#93c5fd';
-  loadLeaderboard('today');
+  switchLbTab('today');
 }
 
 async function loadLeaderboard(tab) {
@@ -1149,15 +1181,18 @@ async function loadLeaderboard(tab) {
 
   try {
     const { collection, getDocs, query, where, orderBy } = window._fb;
-    let q = tab === 'today'
-      ? query(collection(db, 'scores'), where('date', '==', getTodayKey()), orderBy('totalTries'), orderBy('totalTime'))
-      : query(collection(db, 'scores'), orderBy('totalTries'), orderBy('totalTime'));
-
-    const snapshot = await getDocs(q);
     let scores = [];
-    snapshot.forEach(d => scores.push(d.data()));
 
-    if (tab === 'alltime') {
+    if (tab === 'today') {
+      const q = query(collection(db, 'scores'), where('date', '==', getTodayKey()), orderBy('totalTries'), orderBy('totalTime'));
+      const snap = await getDocs(q);
+      snap.forEach(d => scores.push(d.data()));
+
+    } else if (tab === 'alltime') {
+      const q = query(collection(db, 'scores'), orderBy('totalTries'), orderBy('totalTime'));
+      const snap = await getDocs(q);
+      snap.forEach(d => scores.push(d.data()));
+      // Best daily score per player
       const best = {};
       scores.forEach(s => {
         if (!best[s.name] || s.totalTries < best[s.name].totalTries ||
@@ -1165,6 +1200,12 @@ async function loadLeaderboard(tab) {
           best[s.name] = s;
       });
       scores = Object.values(best).sort((a,b) => a.totalTries - b.totalTries || a.totalTime - b.totalTime);
+
+    } else if (tab === 'quick' || tab === 'friend') {
+      const collName = tab === 'quick' ? 'wins_quick' : 'wins_friend';
+      const q = query(collection(db, collName), orderBy('wins', 'desc'));
+      const snap = await getDocs(q);
+      snap.forEach(d => scores.push(d.data()));
     }
 
     document.getElementById('lb-loading').style.display = 'none';
@@ -1176,20 +1217,31 @@ async function loadLeaderboard(tab) {
 
     let html = '';
     if (scores.length === 0) {
-      html = `<div style="text-align:center;color:#93c5fd;padding:32px;font-weight:700;font-family:'Nunito',sans-serif;">No scores yet!<br><br>${tab === 'today' ? 'Be the first! 🚀' : 'Play Daily Challenge to appear here!'}</div>`;
+      const emptyMsg = tab === 'quick' ? 'Play Quick Challenge to appear here!'
+        : tab === 'friend' ? 'Win a Friend Challenge to appear here!'
+        : tab === 'today' ? 'Be the first today! 🚀'
+        : 'Play Daily Challenge to appear here!';
+      html = `<div style="text-align:center;color:#93c5fd;padding:32px;font-weight:700;font-family:'Nunito',sans-serif;">No scores yet!<br><br>${emptyMsg}</div>`;
     } else {
       top10.forEach((s, i) => {
         const rank = i + 1;
         const isMe = s.name === myUsername;
         const rankClass = rank <= 3 ? `top${rank}` : '';
         const rankLabel = rank <= 3 ? medals[rank-1] : `#${rank}`;
-        const played = s.matchesPlayed || 1;
+        let scoreLabel, detailLabel;
+        if (tab === 'quick' || tab === 'friend') {
+          scoreLabel = `${s.wins} wins`;
+          detailLabel = '';
+        } else {
+          scoreLabel = `${s.totalTries} pts`;
+          detailLabel = `${s.matchesPlayed||1}/10`;
+        }
         html += `<div class="lb-row ${rankClass} ${isMe?'me':''}">
           <div class="lb-rank">${rankLabel}</div>
           <div class="lb-flag">${s.flag||'🌍'}</div>
           <div class="lb-name">${s.name}${isMe?' 👈':''}</div>
-          <div class="lb-tries">${s.totalTries} pts</div>
-          <div class="lb-time">${played}/10</div>
+          <div class="lb-tries">${scoreLabel}</div>
+          <div class="lb-time">${detailLabel}</div>
         </div>`;
       });
     }
@@ -1197,6 +1249,8 @@ async function loadLeaderboard(tab) {
 
     if (myRank > 10 && myUsername) {
       const me = scores[myRank-1];
+      const scoreLabel = (tab === 'quick' || tab === 'friend') ? `${me.wins} wins` : `${me.totalTries} pts`;
+      const detailLabel = (tab === 'quick' || tab === 'friend') ? '' : `${me.matchesPlayed}/10`;
       document.getElementById('lb-my-row').style.display = 'block';
       document.getElementById('lb-my-row').innerHTML = `
         <div class="lb-separator">• • •</div>
@@ -1204,8 +1258,8 @@ async function loadLeaderboard(tab) {
           <div class="lb-rank">#${myRank}</div>
           <div class="lb-flag">${me.flag||'🌍'}</div>
           <div class="lb-name">${me.name} 👈</div>
-          <div class="lb-tries">${me.totalTries} pts</div>
-          <div class="lb-time">${me.matchesPlayed}/10</div>
+          <div class="lb-tries">${scoreLabel}</div>
+          <div class="lb-time">${detailLabel}</div>
         </div>`;
     }
   } catch(e) {
@@ -1659,19 +1713,24 @@ function showWin(tries) {
   document.getElementById('win-try-word').textContent = tries === 1 ? 'y' : 'ies';
   const isDaily = gameMode === 'daily';
   const isFriend = gameMode === 'friend';
+  const isQuick = gameMode === 'bot';
   document.getElementById('lb-btn-win').style.display = isDaily ? 'block' : 'none';
   document.getElementById('taunt-btn-win').style.display = isFriend ? 'block' : 'none';
+  document.getElementById('challenge-back-btn-win').style.display = isFriend ? 'block' : 'none';
   if (isDaily) {
     submitDailyScore(tries, true);
     const state = getDailyScoreState();
     const remaining = getRemainingMatches();
     document.getElementById('win-sub').innerHTML = `Guessed in <u>${tries}</u> tr${tries===1?'y':'ies'}! Score so far: <u style="color:var(--gold)">${state.totalTries} pts</u> (${state.matchesPlayed}/10)`;
-    // Change Play Again to Next Match if more left
     const againBtn = document.querySelector('#screen-win .btn-again');
     if (againBtn) {
       againBtn.textContent = remaining > 0 ? `Next Match (${remaining} left)` : 'Done for Today!';
       againBtn.onclick = remaining > 0 ? startDailyChallenge : () => showScreen('screen-home');
     }
+  } else if (isQuick || isFriend) {
+    submitModeWin(isQuick ? 'quick' : 'friend');
+    const againBtn = document.querySelector('#screen-win .btn-again');
+    if (againBtn) { againBtn.textContent = 'Play Again'; againBtn.onclick = startBotGame; }
   }
   spawnConfetti();
   showScreen('screen-win');
@@ -1683,7 +1742,9 @@ function showLose() {
   updateStats(false, 0);
   document.getElementById('lose-number').textContent = secretNumber;
   const isDaily = gameMode === 'daily';
+  const isFriend = gameMode === 'friend';
   document.getElementById('lb-btn-lose').style.display = isDaily ? 'block' : 'none';
+  document.getElementById('challenge-back-btn-lose').style.display = isFriend ? 'block' : 'none';
   if (isDaily) {
     submitDailyScore(3, false);
     const state = getDailyScoreState();
@@ -1696,6 +1757,35 @@ function showLose() {
     }
   }
   showScreen('screen-lose');
+}
+
+function challengeBack() {
+  // Pick a random number for the return challenge
+  const num = Math.floor(Math.random() * 10);
+  const encoded = btoa(`bmi3:${num}:${Date.now()}`);
+  const longUrl = `${location.origin}${location.pathname}?c=${encoded}`;
+  const msg = `I played your challenge — now guess mine! Beat Me in 3:\n${longUrl}`;
+
+  // Try to shorten first
+  fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`)
+    .then(r => r.text())
+    .then(short => {
+      const shortMsg = `I played your challenge — now guess mine! Beat Me in 3:\n${short}`;
+      if (navigator.share) {
+        navigator.share({ title: 'Beat Me in 3 — Your Turn!', text: shortMsg }).catch(() => copyToClipboard(shortMsg));
+      } else {
+        copyToClipboard(shortMsg);
+        showToast('Challenge link copied! Send it back 📋');
+      }
+    })
+    .catch(() => {
+      if (navigator.share) {
+        navigator.share({ title: 'Beat Me in 3 — Your Turn!', text: msg }).catch(() => copyToClipboard(msg));
+      } else {
+        copyToClipboard(longUrl);
+        showToast('Challenge link copied! Send it back 📋');
+      }
+    });
 }
 
 // === Confetti ===
@@ -1887,18 +1977,36 @@ function showTaunt() {
   const list = document.getElementById('taunt-list');
   list.innerHTML = TAUNTS.map(t => {
     const msg = t.replace('${tries}', tries);
-    return `<button class="modal-close" style="background:rgba(255,255,255,0.1);color:white;font-size:0.9rem;padding:12px;text-align:left;" onclick="sendTaunt('${msg}')">${msg}</button>`;
+    return `<button class="modal-close" style="background:rgba(255,255,255,0.1);color:white;font-size:0.9rem;padding:12px;text-align:left;" onclick="sendTaunt(\`${msg}\`)">${msg}</button>`;
   }).join('');
   document.getElementById('taunt-modal').classList.add('active');
 }
 
 function sendTaunt(msg) {
   document.getElementById('taunt-modal').classList.remove('active');
-  const fullMsg = `${msg}\nPlay Beat Me in 3: https://oddpebblegames.github.io/beat-me-in-3`;
+  // Generate a challenge-back link with a random number for the friend to guess
+  const challengeNum = Math.floor(Math.random() * 10);
+  const encoded = btoa(`bmi3:${challengeNum}:${Date.now()}`);
+  const challengeUrl = `${location.origin}${location.pathname}?c=${encoded}`;
+  // Try to shorten it
+  fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(challengeUrl)}`)
+    .then(r => r.text())
+    .then(short => {
+      const fullMsg = `${msg}\nChallenge me back: ${short}`;
+      doShare(fullMsg);
+    })
+    .catch(() => {
+      const fullMsg = `${msg}\nChallenge me back: ${challengeUrl}`;
+      doShare(fullMsg);
+    });
+}
+
+function doShare(text) {
   if (navigator.share) {
-    navigator.share({ title: 'Beat Me in 3', text: fullMsg });
+    navigator.share({ title: 'Beat Me in 3', text }).catch(() => copyToClipboard(text));
   } else {
-    copyToClipboard(fullMsg);
+    copyToClipboard(text);
+    showToast('Copied! Send it to your friend 📋');
   }
 }
 
@@ -1923,12 +2031,19 @@ function onboardNext() {
   slides[onboardStep].style.display = 'flex';
   dots[onboardStep].classList.add('active');
   if (onboardStep === slides.length - 1) {
-    document.getElementById('onboard-next-btn').textContent = "Let's Play!";
+    document.getElementById('onboard-next-btn').textContent = window._pendingChallenge ? 'Accept Challenge! 🎯' : "Let's Play!";
   }
 }
+
 function skipOnboarding() {
   localStorage.setItem('bmi3_onboarded', '1');
-  showScreen('screen-home');
+  if (window._onboardingCallback) {
+    const cb = window._onboardingCallback;
+    window._onboardingCallback = null;
+    cb();
+  } else {
+    showScreen('screen-home');
+  }
 }
 
 // === Friend Challenge Deep Link ===
@@ -1936,29 +2051,42 @@ let pendingChallengeNum = null;
 
 function createFriendChallenge() {
   pendingChallengeNum = pickerNum;
-  const encoded = btoa(`bmi3:${pickerNum}:${Date.now()}`);
-  const longUrl = `${location.origin}${location.pathname}?c=${encoded}`;
+  // Encode number simply — easy to decode, survives URL shorteners
+  const token = `${pickerNum}x${Date.now()}`;
+  const encoded = btoa(token);
+  const baseUrl = `${location.origin}${location.pathname.replace(/\/$/, '')}`;
+  const longUrl = `${baseUrl}?c=${encodeURIComponent(encoded)}`;
 
-  // Show link box immediately with long URL
   const box = document.getElementById('challenge-link-box');
   const linkText = document.getElementById('challenge-link-text');
   const hint = document.getElementById('share-hint-text');
+
+  // Store for sharing
+  window._currentChallengeUrl = longUrl;
   linkText.textContent = longUrl;
   box.style.display = 'block';
   hint.style.display = 'none';
 
-  // Try to shorten with TinyURL
+  // Try TinyURL
   fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`)
     .then(r => r.text())
-    .then(short => { linkText.textContent = short; })
-    .catch(() => {}); // keep long URL if it fails
+    .then(short => {
+      if (short.startsWith('http')) {
+        window._currentChallengeUrl = short;
+        linkText.textContent = short;
+      }
+    })
+    .catch(() => {});
 }
 
 function shareFriendChallenge() {
-  const link = document.getElementById('challenge-link-text').textContent;
-  const msg = `Can you beat me? Guess my number in Beat Me in 3!\n${link}`;
+  const link = window._currentChallengeUrl || document.getElementById('challenge-link-text').textContent;
+  const msg = `🎯 Can you beat me?\nGuess my number in Beat Me in 3!\n${link}`;
   if (navigator.share) {
-    navigator.share({ title: 'Beat Me in 3 Challenge', text: msg }).catch(() => copyToClipboard(msg));
+    navigator.share({ title: 'Beat Me in 3 Challenge', text: msg }).catch(() => {
+      copyToClipboard(link);
+      showToast('Link copied! Send it to your friend 📋');
+    });
   } else {
     copyToClipboard(link);
     showToast('Link copied! Send it to your friend 📋');
@@ -1971,38 +2099,50 @@ function playFriendChallenge() {
   const label = document.getElementById('game-mode-label');
   label.style.display = 'block';
   label.textContent = '👥 Friend Challenge';
-  // Reset challenge link UI
   document.getElementById('challenge-link-box').style.display = 'none';
   document.getElementById('share-hint-text').style.display = 'block';
   initGame();
 }
 
-// Check URL for incoming challenge
 function checkIncomingChallenge() {
   const params = new URLSearchParams(location.search);
   const c = params.get('c');
   if (!c) return;
   try {
-    const decoded = atob(c);
-    const parts = decoded.split(':');
-    if (parts[0] === 'bmi3' && parts[1] !== undefined) {
-      const num = parseInt(parts[1]);
-      if (num >= 0 && num <= 9) {
-        pendingChallengeNum = num;
-        gameMode = 'friend';
-        secretNumber = num;
-        const label = document.getElementById('game-mode-label');
-        label.style.display = 'block';
-        label.textContent = '👥 Friend Challenge';
-        // Start game after short delay to let app load
-        setTimeout(() => {
-          showToast("A friend challenged you! Good luck 🎯");
-          initGame();
-          showScreen('screen-game');
-        }, 800);
+    const decoded = atob(decodeURIComponent(c));
+    const num = parseInt(decoded.split('x')[0]);
+    if (!isNaN(num) && num >= 0 && num <= 9) {
+      pendingChallengeNum = num;
+      window._pendingChallenge = { num };
+
+      const isNewUser = !localStorage.getItem('bmi3_onboarded');
+      if (isNewUser) {
+        // New user — show onboarding first, then launch challenge
+        showScreen('screen-onboarding');
+        // Update last slide button to feel challenge-specific
+        document.getElementById('onboard-next-btn').textContent = 'Accept Challenge! 🎯';
+        window._onboardingCallback = () => launchPendingChallenge();
+      } else {
+        // Returning user — go straight in
+        setTimeout(() => launchPendingChallenge(), 600);
       }
     }
-  } catch(e) {}
+  } catch(e) { console.log('No challenge in URL'); }
+}
+
+function launchPendingChallenge() {
+  if (!window._pendingChallenge) return;
+  const { num } = window._pendingChallenge;
+  window._pendingChallenge = null;
+  pendingChallengeNum = num;
+  gameMode = 'friend';
+  secretNumber = num;
+  const label = document.getElementById('game-mode-label');
+  label.style.display = 'block';
+  label.textContent = '👥 Friend Challenge';
+  showToast('A friend challenged you! Good luck 🎯');
+  initGame();
+  showScreen('screen-game');
 }
 
 // === Result Card (Canvas) ===
