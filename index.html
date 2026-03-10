@@ -1045,7 +1045,7 @@ async function submitModeWin(mode) {
 
 function switchLbTab(tab) {
   currentLbTab = tab;
-  ['today','alltime','quick','friend'].forEach(t => {
+  ['today','alltime'].forEach(t => {
     const btn = document.getElementById(`tab-${t}`);
     if (btn) {
       btn.classList.toggle('lb-tab-active', t === tab);
@@ -1095,11 +1095,6 @@ async function loadLeaderboard(tab) {
       });
       scores = Object.values(best).sort((a,b) => a.totalTries - b.totalTries || a.totalTime - b.totalTime);
 
-    } else if (tab === 'quick' || tab === 'friend') {
-      const collName = tab === 'quick' ? 'wins_quick' : 'wins_friend';
-      const q = query(collection(db, collName), orderBy('wins', 'desc'));
-      const snap = await getDocs(q);
-      snap.forEach(d => scores.push(d.data()));
     }
 
     document.getElementById('lb-loading').style.display = 'none';
@@ -1111,10 +1106,7 @@ async function loadLeaderboard(tab) {
 
     let html = '';
     if (scores.length === 0) {
-      const emptyMsg = tab === 'quick' ? 'Play Quick Challenge to appear here!'
-        : tab === 'friend' ? 'Win a Friend Challenge to appear here!'
-        : tab === 'today' ? 'Be the first today! 🚀'
-        : 'Play Daily Challenge to appear here!';
+      const emptyMsg = tab === 'today' ? 'Be the first today! 🚀' : 'Play Daily Challenge to appear here!';
       html = `<div style="text-align:center;color:var(--text-muted);padding:32px;font-weight:700;font-family:'Nunito',sans-serif;">No scores yet!<br><br>${emptyMsg}</div>`;
     } else {
       top10.forEach((s, i) => {
@@ -1826,15 +1818,7 @@ function updateDailyCounter() {
   }
 }
 
-function buyMatches(amount) {
-  extraMatches += amount;
-  extraMatchesDate = getTodayKey();
-  localStorage.setItem('bmi3_extra_matches', extraMatches);
-  localStorage.setItem('bmi3_extra_matches_date', extraMatchesDate);
-  document.getElementById('buy-matches-modal').classList.remove('active');
-  updateDailyCounter();
-  showToast(`${amount} matches added! 🎮`);
-}
+// buyMatches() removed — IAP not implemented
 
 // === Stats ===
 function updateStats(won, tries) {
@@ -1915,30 +1899,9 @@ function getFlagEmoji(countryCode) {
 }
 
 // === Taunt Messages ===
-const TAUNTS = [
-  { text: "Bet you can't guess mine! 😏", useTries: false },
-  { text: "I got it in TRIES tries. Your turn! 🎯", useTries: true },
-  { text: "Easy peasy! Can you beat TRIES/3? 😎", useTries: true },
-  { text: "Too slow! I got it in TRIES! ⚡", useTries: true },
-  { text: "Challenge accepted? I scored TRIES/3 🏆", useTries: true },
-  { text: "Your brain vs mine. Go! 🧠", useTries: false }
-];
+// TAUNTS removed — taunt feature cut
 
-function showTaunt() {
-  const tries = document.getElementById('win-tries').textContent;
-  const list = document.getElementById('taunt-list');
-  list.innerHTML = TAUNTS.map(t => {
-    const msg = t.useTries ? t.text.replace('TRIES', tries) : t.text;
-    return `<button class="modal-close" style="background:rgba(255,255,255,0.1);color:white;font-size:0.9rem;padding:12px;text-align:left;" onclick="sendTaunt(\`${msg}\`)">${msg}</button>`;
-  }).join('');
-  document.getElementById('taunt-modal').classList.add('active');
-}
-
-function sendTaunt(msg) {
-  document.getElementById('taunt-modal').classList.remove('active');
-  const url = makeChallengeUrl(Math.floor(Math.random() * 10));
-  doShare(`${msg}\nChallenge me back: ${url}`);
-}
+// showTaunt() + sendTaunt() removed — taunt feature cut
 
 function doShare(text) {
   if (navigator.share) {
@@ -1958,20 +1921,7 @@ function checkOnboarding() {
   }
 }
 function onboardNext() {
-  const slides = document.querySelectorAll('.onboard-slide');
-  const dots = document.querySelectorAll('.onboard-dot');
-  dots[onboardStep].classList.remove('active');
-  onboardStep++;
-  if (onboardStep >= slides.length) {
-    skipOnboarding();
-    return;
-  }
-  slides[onboardStep - 1].style.display = 'none';
-  slides[onboardStep].style.display = 'flex';
-  dots[onboardStep].classList.add('active');
-  if (onboardStep === slides.length - 1) {
-    document.getElementById('onboard-next-btn').textContent = window._pendingChallenge ? 'Accept Challenge! 🎯' : "Let's Play!";
-  }
+  skipOnboarding();
 }
 
 function skipOnboarding() {
@@ -2331,9 +2281,6 @@ function checkPendingNotifFromPage() {
 registerSW();
 
 // Close modal on overlay click
-document.getElementById('streak-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeStreak();
-});
 document.getElementById('username-modal').addEventListener('click', function(e) {
   if (e.target === this) saveUsername();
 });
@@ -2353,7 +2300,7 @@ document.getElementById('faq-modal').addEventListener('click', function(e) {
 });
 
 function closeBuyMatches() {}
-function closeTaunt() { document.getElementById('taunt-modal').classList.remove('active'); }
+function closeTaunt() {}
 function closeResultCard() { document.getElementById('result-card-modal').classList.remove('active'); }
 </script>
 
