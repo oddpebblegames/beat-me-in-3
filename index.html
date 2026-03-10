@@ -15,6 +15,7 @@
 <meta property="og:url" content="https://oddpebblegames.github.io/beat-me-in-3/">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -898,11 +899,90 @@
 
   <!-- RESULT CARD MODAL -->
   <div class="modal-overlay" id="result-card-modal">
-    <div class="modal" style="padding:0;overflow:hidden;border-radius:24px;max-width:340px;">
-      <canvas id="result-canvas" width="680" height="780" style="width:100%;display:block;border-radius:24px 24px 0 0;"></canvas>
-      <div style="display:flex;gap:8px;padding:14px;background:#1a3fa8;">
-        <button onclick="shareResultCard()" style="flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">Share</button>
-        <button onclick="closeResultCard()" style="padding:14px 18px;border-radius:12px;border:none;background:rgba(255,255,255,0.15);color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;">Close</button>
+    <div style="width:100%;max-width:340px;border-radius:24px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.7);">
+
+      <!-- The shareable card — this div gets snapshotted -->
+      <div id="result-card-html" style="
+        background:linear-gradient(160deg,#1e0750 0%,#150535 50%,#0d0220 100%);
+        padding:0;font-family:'Fredoka One',cursive;position:relative;overflow:hidden;">
+
+        <!-- Gold top bar -->
+        <div style="height:5px;background:linear-gradient(90deg,#92400e,#fbbf24 30%,#fbbf24 70%,#92400e);"></div>
+
+        <!-- Ambient glow -->
+        <div id="rc-glow" style="position:absolute;top:0;left:0;right:0;height:260px;pointer-events:none;"></div>
+
+        <div style="padding:20px 20px 16px;position:relative;z-index:1;">
+
+          <!-- Brand -->
+          <div style="text-align:center;margin-bottom:4px;">
+            <span style="font-family:'Nunito',sans-serif;font-weight:900;font-size:0.7rem;letter-spacing:3px;color:rgba(255,255,255,0.4);">BEAT ME IN</span>
+          </div>
+          <div style="text-align:center;margin-bottom:8px;">
+            <span style="font-family:'Fredoka One',cursive;font-size:3.2rem;color:#fbbf24;text-shadow:0 4px 0 #92400e,0 0 30px rgba(251,191,36,0.5);">3</span>
+          </div>
+
+          <!-- Date pill -->
+          <div style="text-align:center;margin-bottom:16px;">
+            <span id="rc-date" style="font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:700;color:#c4b5fd;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 14px;display:inline-block;"></span>
+          </div>
+
+          <!-- Hero emoji -->
+          <div id="rc-emoji" style="text-align:center;font-size:3.2rem;margin-bottom:8px;filter:drop-shadow(0 0 16px rgba(251,191,36,0.7));"></div>
+
+          <!-- Result text -->
+          <div id="rc-result-text" style="text-align:center;font-family:'Fredoka One',cursive;font-size:2rem;letter-spacing:1px;margin-bottom:4px;text-shadow:0 3px 0 rgba(0,0,0,0.5);"></div>
+
+          <!-- Sub text -->
+          <div id="rc-sub" style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:700;color:rgba(196,181,253,0.8);margin-bottom:16px;"></div>
+
+          <!-- Guess boxes -->
+          <div style="display:flex;justify-content:center;gap:10px;margin-bottom:16px;">
+            <div id="rc-box-0" style="width:72px;height:72px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);"></div>
+            <div id="rc-box-1" style="width:72px;height:72px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);"></div>
+            <div id="rc-box-2" style="width:72px;height:72px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);"></div>
+          </div>
+
+          <!-- Stat pills -->
+          <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <div style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 4px;text-align:center;">
+              <div id="rc-tries" style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:#4ade80;text-shadow:0 0 12px rgba(74,222,128,0.5);"></div>
+              <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:700;color:rgba(196,181,253,0.7);margin-top:2px;">TRIES</div>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 4px;text-align:center;">
+              <div id="rc-time" style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:#fbbf24;text-shadow:0 0 12px rgba(251,191,36,0.5);"></div>
+              <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:700;color:rgba(196,181,253,0.7);margin-top:2px;">TIME</div>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 4px;text-align:center;">
+              <div id="rc-streak" style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:#fb923c;text-shadow:0 0 12px rgba(251,146,60,0.5);"></div>
+              <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:700;color:rgba(196,181,253,0.7);margin-top:2px;">STREAK 🔥</div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div style="border-top:1px solid rgba(255,255,255,0.08);margin-bottom:12px;position:relative;text-align:center;">
+            <span style="position:relative;top:-9px;background:transparent;color:rgba(251,191,36,0.4);font-size:0.7rem;letter-spacing:6px;">★ ★ ★</span>
+          </div>
+
+          <!-- Mode + CTA -->
+          <div id="rc-mode" style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:700;color:rgba(196,181,253,0.7);margin-bottom:6px;"></div>
+          <div style="text-align:center;font-family:'Fredoka One',cursive;font-size:1.3rem;color:white;margin-bottom:12px;">Can you beat me?</div>
+
+          <!-- URL pill -->
+          <div style="background:linear-gradient(90deg,rgba(251,191,36,0.05),rgba(251,191,36,0.15),rgba(251,191,36,0.05));border:1.5px solid rgba(251,191,36,0.5);border-radius:24px;padding:10px;text-align:center;margin-bottom:4px;">
+            <span style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;color:#fbbf24;letter-spacing:0.3px;">oddpebblegames.github.io/beat-me-in-3</span>
+          </div>
+
+        </div>
+
+        <!-- Gold bottom bar -->
+        <div style="height:5px;background:linear-gradient(90deg,#92400e,#fbbf24 30%,#fbbf24 70%,#92400e);"></div>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:8px;padding:12px;background:#0d0220;">
+        <button onclick="shareResultCard()" style="flex:1;padding:14px;border-radius:14px;border:none;background:linear-gradient(160deg,#4ade80,#22c55e);color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;box-shadow:0 4px 0 #14532d;cursor:pointer;">Share 📤</button>
+        <button onclick="closeResultCard()" style="padding:14px 18px;border-radius:14px;border:none;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;">Close</button>
       </div>
     </div>
   </div>
@@ -1439,6 +1519,7 @@ function showScreen(id) {
 function startBotGame() {
   gameMode = 'bot';
   secretNumber = Math.floor(Math.random() * 10);
+  gameStartTime = Date.now();
   document.getElementById('game-mode-label').style.display = 'none';
   initGame();
 }
@@ -2005,6 +2086,7 @@ function launchPendingChallenge() {
   pendingChallengeNum = num;
   gameMode = 'friend';
   secretNumber = num;
+  gameStartTime = Date.now();
   const label = document.getElementById('game-mode-label');
   label.style.display = 'block';
   label.textContent = '👥 Friend Challenge';
@@ -2023,114 +2105,95 @@ function showResultCard(won) {
   lastResultWon = won;
   lastResultTries = won ? parseInt(document.getElementById('win-tries').textContent) : 3;
   lastResultTime = Math.round((Date.now() - gameStartTime) / 1000);
-  drawResultCard(won);
+  populateResultCard(won);
   document.getElementById('result-card-modal').classList.add('active');
 }
 
-function drawResultCard(won) {
-  const canvas = document.getElementById('result-canvas');
-  const ctx = canvas.getContext('2d');
-  const W = 680, H = 780;
-  ctx.clearRect(0, 0, W, H);
+function populateResultCard(won) {
+  const tries = lastResultTries;
 
-  // Background
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#2d1060'); bg.addColorStop(0.5, '#1a0a3c'); bg.addColorStop(1, '#120828');
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-
-  // Top accent bar
-  const acc = ctx.createLinearGradient(0,0,W,0);
-  acc.addColorStop(0,'#fbbf24'); acc.addColorStop(1,'#d97706');
-  ctx.fillStyle = acc; ctx.fillRect(0, 0, W, 8);
-
-  const cf = (text, x, y, font, color, align='center') => {
-    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(text, x, y);
-  };
-
-  // Title
-  cf('Beat Me in ', W/2 - 55, 90, 'bold 52px Nunito,Arial', '#ffffff');
-  cf('3', W/2 + 128, 90, 'bold 52px Nunito,Arial', '#fbbf24');
+  // Glow colour behind hero
+  const glowColor = won ? 'rgba(251,191,36,0.15)' : 'rgba(139,92,246,0.2)';
+  document.getElementById('rc-glow').style.background =
+    `radial-gradient(ellipse at 50% 40%, ${glowColor}, transparent 70%)`;
 
   // Date
-  cf(new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}),
-     W/2, 136, '600 26px Nunito,Arial', '#c4b5fd');
+  document.getElementById('rc-date').textContent =
+    new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
-  // Result
-  cf(won ? 'GOT IT! 🎉' : 'SO CLOSE! 😅', W/2, 230, 'bold 72px Nunito,Arial', won ? '#4ade80' : '#f87171');
+  // Hero emoji + text + colour
+  const heroEmoji = won ? (tries===1 ? '🏆' : tries===2 ? '🎯' : '✅') : '💀';
+  const heroText  = won ? (tries===1 ? 'FIRST TRY!!' : tries===2 ? 'GOT IT!' : 'JUST MADE IT!') : 'NOT THIS TIME';
+  const heroColor = won ? '#fbbf24' : '#f87171';
+  const heroShadow = won ? '0 0 24px rgba(251,191,36,0.6)' : '0 0 24px rgba(248,113,113,0.6)';
+
+  document.getElementById('rc-emoji').textContent = heroEmoji;
+  const rt = document.getElementById('rc-result-text');
+  rt.textContent = heroText;
+  rt.style.color = heroColor;
+  rt.style.textShadow = `0 3px 0 rgba(0,0,0,0.5), ${heroShadow}`;
+
+  // Sub text
+  document.getElementById('rc-sub').textContent = won
+    ? `Guessed in ${tries} tr${tries===1?'y':'ies'} • ${lastResultTime}s`
+    : `The number was hidden…`;
 
   // Guess boxes
-  const bS=100, gap=20, totalW=3*bS+2*gap, sX=(W-totalW)/2, sY=270;
   for (let i=0; i<3; i++) {
-    const x=sX+i*(bS+gap), y=sY;
-    const isCorrect=won&&i===lastResultTries-1, isUsed=i<lastResultTries;
-    ctx.beginPath();
-    roundRect(ctx, x, y, bS, bS, 16);
-    ctx.fillStyle = isCorrect?'rgba(74,222,128,0.25)':isUsed?'rgba(248,113,113,0.2)':'rgba(255,255,255,0.05)';
-    ctx.fill();
-    ctx.strokeStyle = isCorrect?'#4ade80':isUsed?'#f87171':'rgba(255,255,255,0.15)';
-    ctx.lineWidth=3; ctx.stroke();
-    cf(isCorrect?'✓':isUsed?'✗':'○', x+bS/2, y+bS/2+16, '44px Arial', 'white');
+    const box = document.getElementById(`rc-box-${i}`);
+    const isCorrect = won && i === tries-1;
+    const isUsed    = i < tries;
+    box.textContent = isCorrect ? '✓' : isUsed ? '✗' : '○';
+    box.style.background  = isCorrect ? 'rgba(74,222,128,0.2)' : isUsed ? 'rgba(248,113,113,0.15)' : 'rgba(255,255,255,0.04)';
+    box.style.border      = `2px solid ${isCorrect ? '#4ade80' : isUsed ? '#f87171' : 'rgba(255,255,255,0.1)'}`;
+    box.style.color       = isCorrect ? '#4ade80' : isUsed ? '#f87171' : 'rgba(255,255,255,0.2)';
+    box.style.boxShadow   = isCorrect ? '0 0 16px rgba(74,222,128,0.4)' : isUsed ? '0 0 10px rgba(248,113,113,0.2)' : 'none';
   }
 
   // Stats
-  [['Tries', won?`${lastResultTries}/3`:'X/3'],['Time',`${lastResultTime}s`],['Streak',`${streak}🔥`]]
-    .forEach(([label,value],i) => {
-      const sx=90+i*170;
-      cf(value, sx+80, 430, 'bold 42px Nunito,Arial', '#fbbf24');
-      cf(label, sx+80, 464, '600 22px Nunito,Arial', '#c4b5fd');
-    });
+  document.getElementById('rc-tries').textContent  = won ? `${tries}/3` : '✗/3';
+  document.getElementById('rc-tries').style.color   = won ? '#4ade80' : '#f87171';
+  document.getElementById('rc-time').textContent    = `${lastResultTime}s`;
+  document.getElementById('rc-streak').textContent  = streak;
 
-  // Divider
-  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(40,510); ctx.lineTo(W-40,510); ctx.stroke();
-
-  // Mode + CTA
-  const mode = gameMode==='daily'?'📅 Daily Challenge':gameMode==='friend'?'👥 Friend Challenge':'⚡ Quick Challenge';
-  cf(mode, W/2, 555, '700 26px Nunito,Arial', '#c4b5fd');
-  cf('Can you beat me?', W/2, 610, 'bold 30px Nunito,Arial', '#ffffff');
-
-  // URL pill
-  const pW=360,pH=52,pX=(W-pW)/2,pY=640;
-  ctx.beginPath(); roundRect(ctx,pX,pY,pW,pH,26);
-  ctx.fillStyle='rgba(251,191,36,0.15)'; ctx.fill();
-  ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2; ctx.stroke();
-  cf('oddpebblegames.github.io/beat-me-in-3', W/2, pY+34, 'bold 22px Nunito,Arial', '#fbbf24');
-
-  cf('Beat Me in 3 — Daily Number Challenge', W/2, 740, '600 20px Nunito,Arial', 'rgba(255,255,255,0.25)');
-}
-
-function roundRect(ctx,x,y,w,h,r) {
-  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  // Mode label
+  const modeMap = { daily:'📅 Daily Challenge', friend:'👥 Friend Challenge', bot:'⚡ Quick Challenge' };
+  document.getElementById('rc-mode').textContent = modeMap[gameMode] || '⚡ Quick Challenge';
 }
 
 async function shareResultCard() {
-  const canvas = document.getElementById('result-canvas');
+  const shareUrl = 'https://oddpebblegames.github.io/beat-me-in-3';
+  const text = lastResultWon
+    ? `I guessed it in ${lastResultTries}/3 tries! Can you beat me?\n${shareUrl}`
+    : `So close! Can you do better?\n${shareUrl}`;
+
+  // Try html2canvas snapshot first
   try {
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'beatmein3.png', { type: 'image/png' });
-      const shareUrl = 'https://oddpebblegames.github.io/beat-me-in-3';
-      const text = lastResultWon
-        ? `I guessed it in ${lastResultTries}/3 tries! Can you beat me?\n${shareUrl}`
-        : `So close! Can you do better?\n${shareUrl}`;
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ title: 'Beat Me in 3', text, files: [file] });
-      } else if (navigator.share) {
-        await navigator.share({ title: 'Beat Me in 3', text });
-      } else {
-        // Download the image
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/png');
-        a.download = 'beatmein3.png';
-        a.click();
-        copyToClipboard(text);
-      }
-    }, 'image/png');
+    if (typeof html2canvas !== 'undefined') {
+      const card = document.getElementById('result-card-html');
+      const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null });
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'beatmein3.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ title: 'Beat Me in 3', text, files: [file] });
+        } else if (navigator.share) {
+          await navigator.share({ title: 'Beat Me in 3', text });
+        } else {
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL('image/png');
+          a.download = 'beatmein3.png'; a.click();
+        }
+      }, 'image/png');
+      return;
+    }
+  } catch(e) { console.log('html2canvas failed, falling back', e); }
+
+  // Fallback: share text + url
+  try {
+    if (navigator.share) await navigator.share({ title: 'Beat Me in 3', text });
+    else { copyToClipboard(text); showToast('Link copied! 📋'); }
   } catch(e) {
-    copyToClipboard('https://oddpebblegames.github.io/beat-me-in-3');
-    showToast('Link copied! 📋');
+    copyToClipboard(shareUrl); showToast('Link copied! 📋');
   }
 }
 // === Free trial hint ===
