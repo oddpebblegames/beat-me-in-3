@@ -660,15 +660,24 @@
   <div class="screen active" id="screen-home">
     <!-- Profile top-left -->
     <div style="position:absolute;top:16px;left:16px;z-index:10;">
-      <button class="icon-btn" onclick="showStats()" id="profile-btn" style="display:flex;align-items:center;gap:5px;padding:0 10px 0 6px;">
-        <div id="profile-avatar" style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4c1d95);display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:0.85rem;color:white;flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
-        <span style="font-size:0.8rem;">🔥</span><span id="home-streak-badge" style="font-family:'Fredoka One',cursive;font-size:0.85rem;color:white;line-height:1;">0</span>
+      <button class="icon-btn" onclick="showStats()" id="profile-btn" style="position:relative;">
+        <div id="profile-avatar" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4c1d95);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,0.25);flex-shrink:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div id="home-streak-badge" style="position:absolute;top:-5px;right:-5px;background:#f97316;border-radius:8px;padding:1px 4px;font-family:'Fredoka One',cursive;font-size:0.6rem;color:white;line-height:1.4;min-width:14px;text-align:center;border:1.5px solid #1a0a3c;">0</div>
       </button>
     </div>
     <!-- Sound + FAQ top-right -->
     <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;z-index:10;">
-      <button class="icon-btn" id="home-sound-btn" onclick="toggleSound()" title="Sound"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/><path d="M16.5 12c0-1.77-1-3.29-2.5-4.03v8.06c1.5-.74 2.5-2.26 2.5-4.03Z" fill="white" opacity="0.8"/><path d="M19 12c0-3.04-1.73-5.64-4.27-6.96l-.73 1.3A6 6 0 0 1 17 12a6 6 0 0 1-2.97 5.18l.72 1.3A7.97 7.97 0 0 0 19 12Z" fill="white" opacity="0.5"/></svg></button>
-      <button class="icon-btn" onclick="openFAQ()" title="FAQ" style="font-family:'Fredoka One',cursive;font-size:1rem;font-weight:900;color:white;">?</button>
+      <button class="icon-btn" id="home-sound-btn" onclick="toggleSound()" title="Sound">
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,0.25);">
+          <svg id="sound-icon-on" width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/><path d="M16.5 12c0-1.77-1-3.29-2.5-4.03v8.06c1.5-.74 2.5-2.26 2.5-4.03Z" fill="white" opacity="0.8"/><path d="M19 12c0-3.04-1.73-5.64-4.27-6.96l-.73 1.3A6 6 0 0 1 17 12a6 6 0 0 1-2.97 5.18l.72 1.3A7.97 7.97 0 0 0 19 12Z" fill="white" opacity="0.5"/></svg>
+          <svg id="sound-icon-off" width="13" height="13" viewBox="0 0 24 24" fill="none" style="display:none;"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white" opacity="0.4"/><line x1="22" y1="9" x2="16" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="9" x2="22" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+      </button>
+      <button class="icon-btn" onclick="openFAQ()" title="FAQ">
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,0.25);font-family:'Fredoka One',cursive;font-size:0.85rem;font-weight:900;color:white;">?</div>
+      </button>
     </div>
     <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
       <div style="width:90px;height:90px;border-radius:22px;margin-bottom:8px;box-shadow:0 8px 32px rgba(124,58,237,0.6),0 0 0 3px rgba(251,191,36,0.3);background:linear-gradient(160deg,#4c1d95,#1a0a3c);display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;">
@@ -1307,8 +1316,11 @@ function toggleSound() {
   soundEnabled = !soundEnabled;
   const svg = soundEnabled ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/><path d="M16.5 12c0-1.77-1-3.29-2.5-4.03v8.06c1.5-.74 2.5-2.26 2.5-4.03Z" fill="white" opacity="0.8"/><path d="M19 12c0-3.04-1.73-5.64-4.27-6.96l-.73 1.3A6 6 0 0 1 17 12a6 6 0 0 1-2.97 5.18l.72 1.3A7.97 7.97 0 0 0 19 12Z" fill="white" opacity="0.5"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3Z" fill="white"/><line x1="23" y1="9" x2="17" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="17" y1="9" x2="23" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>';
   document.getElementById('sound-btn').innerHTML = svg;
-  const homeBtn = document.getElementById('home-sound-btn');
-  if (homeBtn) homeBtn.innerHTML = svg;
+  // Toggle the two named SVGs in the home button (preserves inner circle wrapper)
+  const iconOn = document.getElementById('sound-icon-on');
+  const iconOff = document.getElementById('sound-icon-off');
+  if (iconOn) iconOn.style.display = soundEnabled ? 'block' : 'none';
+  if (iconOff) iconOff.style.display = soundEnabled ? 'none' : 'block';
   if (soundEnabled) startBGM(); else stopBGM();
 }
 
@@ -1839,8 +1851,8 @@ function updateProfileBadge() {
   const username = localStorage.getItem('bmi3_username') || '';
   const badge = document.getElementById('home-streak-badge');
   const avatar = document.getElementById('profile-avatar');
-  if (badge) badge.textContent = streak;
-  if (avatar) avatar.innerHTML = username ? username.charAt(0).toUpperCase() : '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+  if (badge) { badge.textContent = streak > 0 ? streak : ''; badge.style.display = streak > 0 ? 'block' : 'none'; }
+  if (avatar) avatar.innerHTML = username ? `<span style="font-family:'Fredoka One',cursive;font-size:0.8rem;color:white;">${username.charAt(0).toUpperCase()}</span>` : '<svg width="13" height="13" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
 }
 
 function showStats() {
