@@ -5,11 +5,22 @@ export default defineConfig({
   base: '/beat-me-in-3/',
   build: {
     outDir: 'dist',
+    // Target modern browsers for smaller output
+    target: 'es2020',
+    // Enable CSS code-splitting
+    cssCodeSplit: true,
+    // Minification settings
+    minify: 'esbuild',
     rollupOptions: {
       output: {
+        // Separate Firebase into its own chunk (large, cached separately)
         manualChunks: {
           firebase: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/analytics'],
         },
+        // Content-hash filenames for long-lived caching
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
       },
     },
   },

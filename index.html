@@ -27,9 +27,34 @@
   <!-- Preconnect for font performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- font-display=swap prevents render-blocking; subset only needed weights -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Preconnect to Firebase (loaded after interaction) -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
 
   <title>Beat Me in 3</title>
+
+  <!-- Critical CSS inlined for fastest FCP -->
+  <style>
+    :root {
+      --color-bg-primary: #040e2e;
+      --color-brand-500: #2655cc;
+      --color-white: #ffffff;
+      --font-body: system-ui, sans-serif;
+    }
+    html { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--color-bg-primary);
+      color: var(--color-white);
+      font-family: var(--font-body);
+      min-height: 100dvh;
+    }
+    #app { width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .skip-link { position: absolute; top: -100%; }
+  </style>
 </head>
 <body>
 
