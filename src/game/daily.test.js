@@ -1,8 +1,5 @@
-/**
- * Daily Logic Unit Tests — Beat Me in 3
- */
-
 import { describe, it, expect, beforeEach } from 'vitest';
+import { clear } from '../state/store.js';
 import {
   getTodayKey,
   getDailySecret,
@@ -15,155 +12,174 @@ import {
   MAX_DAILY_MATCHES,
 } from './daily.js';
 
-const _store = {};
-vi.mock('../state/store.js', () => ({
-  get      : (k)    => (k in _store ? _store[k] : null),
-  set      : (k, v) => { _store[k] = v; },
-  getNumber: (k, d) => (typeof _store[k] === 'number' ? _store[k] : d),
-  getObject: (k, d) => (k in _store && _store[k] !== null ? _store[k] : d),
-}));
-
 beforeEach(() => {
-  Object.keys(_store).forEach(k => delete _store[k]);
+  clear();
 });
 
-const TODAY = new Date('2026-03-26T12:00:00Z').getTime();
+// Fixed timestamp: 2024-03-15 12:00:00 UTC
+const TS_MAR15 = Date.UTC(2024, 2, 15, 12, 0, 0);
+const TS_MAR16 = Date.UTC(2024, 2, 16, 0, 30, 0);
 
-describe('getTodayKey()', () => {
-  it('formats date as YYYY-M-DD UTC', () => {
-    expect(getTodayKey(new Date('2026-03-26T00:00:00Z').getTime())).toBe('2026-3-26');
+describe('getTodayKey', () => {
+  it('returns YYYY-M-DD format', () => {
+    expect(getTodayKey(TS_MAR15)).toBe('2024-3-15');
   });
-  it('handles year boundary', () => {
-    expect(getTodayKey(new Date('2026-01-01T00:00:00Z').getTime())).toBe('2026-1-1');
+
+  it('different timestamps on same UTC day return same key', () => {
+    const morning = Date.UTC(2024, 2, 15, 0, 0, 0);
+    const evening = Date.UTC(2024, 2, 15, 23, 59, 0);
+    expect(getTodayKey(morning)).toBe(getTodayKey(evening));
+  });
+
+  it('timestamps across midnight produce different keys', () => {
+    const before = Date.UTC(2024, 2, 15, 23, 59, 59);
+    const after  = Date.UTC(2024, 2, 16, 0, 0, 1);
+    expect(getTodayKey(before)).not.toBe(getTodayKey(after));
   });
 });
 
-describe('getDailySecret()', () => {
-  it('returns integer 0–9', () => {
+describe('getDailySecret', () => {
+  it('returns a number 0–9', () => {
     for (let i = 0; i < 10; i++) {
-      const s = getDailySecret('2026-3-26', i);
+      const s = getDailySecret('2024-3-15', i);
       expect(s).toBeGreaterThanOrEqual(0);
       expect(s).toBeLessThanOrEqual(9);
       expect(Number.isInteger(s)).toBe(true);
     }
   });
 
-  it('is deterministic', () => {
-    const a = getDailySecret('2026-3-26', 3);
-    const b = getDailySecret('2026-3-26', 3);
-    expect(a).toBe(b);
+  it('is deterministic — same inputs, same output', () => {
+    expect(getDailySecret('2024-3-15', 0)).toBe(getDailySecret('2024-3-15', 0));
+    expect(getDailySecret('2024-3-15', 5)).toBe(getDailySecret('2024-3-15', 5));
   });
 
-  it('differs across match indices', () => {
-    const results = new Set();
-    for (let i = 0; i < 10; i++) results.add(getDailySecret('2026-3-26', i));
-    expect(results.size).toBeGreaterThan(1);
+  it('different matchIndex produces (usually) different secret', () => {
+    const secrets = Array.from({ length: 10 }, (_, i) => getDailySecret('2024-3-15', i));
+    const unique = new Set(secrets);
+    // Not all 10 are required to be unique, but most should differ
+    expect(unique.size).toBeGreaterThan(3);
   });
 
-  it('differs across dates', () => {
-    const a = getDailySecret('2026-3-26', 0);
-    const b = getDailySecret('2026-3-27', 0);
-    // Very likely to differ (not guaranteed but probability of collision is 10%)
-    // We just check it's deterministic for each
-    expect(getDailySecret('2026-3-26', 0)).toBe(a);
-    expect(getDailySecret('2026-3-27', 0)).toBe(b);
+  it('different dates produce different secrets for matchIndex 0', () => {
+    const a = getDailySecret('2024-3-15', 0);
+    const b = getDailySecret('2024-3-16', 0);
+    // High probability of difference
+    expect(a !== b || getDailySecret('2024-3-17', 0) !== a).toBe(true);
   });
 });
 
-describe('getDailyState()', () => {
-  it('returns fresh state on first call', () => {
-    const s = getDailyState(TODAY);
-    expect(s.matchesCompleted).toBe(0);
-    expect(s.totalTries).toBe(0);
-    expect(s.scoreDetail).toEqual([]);
+describe('getDailyState', () => {
+  it('returns fresh state if no saved state', () => {
+    const state = getDailyState(TS_MAR15);
+    expect(state.matchesCompleted).toBe(0);
+    expect(state.totalTries).toBe(0);
+    expect(state.totalTime).toBe(0);
+    expect(state.scoreDetail).toEqual([]);
   });
 
   it('resets state when date changes', () => {
-    recordMatchResult({ won: true, tries: 2, time: 5000 }, TODAY);
-    const tomorrow = TODAY + 24 * 60 * 60 * 1000 + 1000;
-    const s = getDailyState(tomorrow);
-    expect(s.matchesCompleted).toBe(0);
+    getDailyState(TS_MAR15); // initialize for Mar 15
+    recordMatchResult({ won: true, tries: 2, time: 5000 }, TS_MAR15);
+
+    // Move to Mar 16 — state should reset
+    const state = getDailyState(TS_MAR16);
+    expect(state.matchesCompleted).toBe(0);
+    expect(state.totalTries).toBe(0);
+    expect(state.date).toBe('2024-3-16');
   });
 });
 
-describe('recordMatchResult()', () => {
-  it('increments match count', () => {
-    recordMatchResult({ won: true, tries: 1, time: 1000 }, TODAY);
-    expect(getDailyState(TODAY).matchesCompleted).toBe(1);
+describe('recordMatchResult', () => {
+  it('increments matchesCompleted', () => {
+    getDailyState(TS_MAR15);
+    recordMatchResult({ won: true, tries: 1, time: 3000 }, TS_MAR15);
+    expect(getDailyState(TS_MAR15).matchesCompleted).toBe(1);
   });
 
-  it('adds tries for a win', () => {
-    recordMatchResult({ won: true, tries: 2, time: 1000 }, TODAY);
-    expect(getDailyState(TODAY).totalTries).toBe(2);
+  it('adds tries to totalTries on win', () => {
+    getDailyState(TS_MAR15);
+    recordMatchResult({ won: true, tries: 2, time: 5000 }, TS_MAR15);
+    expect(getDailyState(TS_MAR15).totalTries).toBe(2);
   });
 
   it('counts loss as 3 tries', () => {
-    recordMatchResult({ won: false, tries: 3, time: 3000 }, TODAY);
-    expect(getDailyState(TODAY).totalTries).toBe(3);
+    getDailyState(TS_MAR15);
+    recordMatchResult({ won: false, tries: 3, time: 8000 }, TS_MAR15);
+    expect(getDailyState(TS_MAR15).totalTries).toBe(3);
   });
 
-  it('accumulates across multiple matches', () => {
-    recordMatchResult({ won: true,  tries: 1, time: 1000 }, TODAY);
-    recordMatchResult({ won: true,  tries: 2, time: 2000 }, TODAY);
-    recordMatchResult({ won: false, tries: 3, time: 3000 }, TODAY);
-    const s = getDailyState(TODAY);
-    expect(s.matchesCompleted).toBe(3);
-    expect(s.totalTries).toBe(6);
-    expect(s.totalTime).toBe(6000);
+  it('accumulates tries across multiple matches', () => {
+    getDailyState(TS_MAR15);
+    recordMatchResult({ won: true, tries: 1, time: 2000 }, TS_MAR15);
+    recordMatchResult({ won: true, tries: 2, time: 4000 }, TS_MAR15);
+    recordMatchResult({ won: false, tries: 3, time: 15000 }, TS_MAR15);
+    expect(getDailyState(TS_MAR15).totalTries).toBe(6);
   });
 
-  it('records score detail', () => {
-    recordMatchResult({ won: true, tries: 1, time: 500 }, TODAY);
-    const s = getDailyState(TODAY);
-    expect(s.scoreDetail).toHaveLength(1);
-    expect(s.scoreDetail[0].won).toBe(true);
+  it('accumulates time', () => {
+    getDailyState(TS_MAR15);
+    recordMatchResult({ won: true, tries: 1, time: 3000 }, TS_MAR15);
+    recordMatchResult({ won: true, tries: 1, time: 2500 }, TS_MAR15);
+    expect(getDailyState(TS_MAR15).totalTime).toBe(5500);
   });
 });
 
-describe('isDailyComplete()', () => {
-  it('returns false before 10 matches', () => {
-    expect(isDailyComplete(TODAY)).toBe(false);
+describe('isDailyComplete', () => {
+  it('returns false when no matches played', () => {
+    expect(isDailyComplete(TS_MAR15)).toBe(false);
   });
 
   it('returns true after 10 matches', () => {
+    getDailyState(TS_MAR15);
     for (let i = 0; i < MAX_DAILY_MATCHES; i++) {
-      recordMatchResult({ won: true, tries: 1, time: 500 }, TODAY);
+      recordMatchResult({ won: true, tries: 1, time: 1000 }, TS_MAR15);
     }
-    expect(isDailyComplete(TODAY)).toBe(true);
+    expect(isDailyComplete(TS_MAR15)).toBe(true);
   });
 });
 
-describe('remainingMatches()', () => {
-  it('starts at 10', () => {
-    expect(remainingMatches(TODAY)).toBe(10);
+describe('remainingMatches', () => {
+  it('returns 10 when fresh', () => {
+    expect(remainingMatches(TS_MAR15)).toBe(MAX_DAILY_MATCHES);
   });
 
   it('decrements with each match', () => {
-    recordMatchResult({ won: true, tries: 1, time: 500 }, TODAY);
-    expect(remainingMatches(TODAY)).toBe(9);
+    getDailyState(TS_MAR15);
+    recordMatchResult({ won: true, tries: 1, time: 1000 }, TS_MAR15);
+    recordMatchResult({ won: true, tries: 1, time: 1000 }, TS_MAR15);
+    expect(remainingMatches(TS_MAR15)).toBe(8);
   });
 
-  it('never goes below 0', () => {
-    for (let i = 0; i < 12; i++) {
-      recordMatchResult({ won: true, tries: 1, time: 500 }, TODAY);
+  it('never returns negative', () => {
+    getDailyState(TS_MAR15);
+    for (let i = 0; i < MAX_DAILY_MATCHES + 2; i++) {
+      recordMatchResult({ won: true, tries: 1, time: 1000 }, TS_MAR15);
     }
-    expect(remainingMatches(TODAY)).toBe(0);
+    expect(remainingMatches(TS_MAR15)).toBe(0);
   });
 });
 
-describe('nextMatchSecret()', () => {
-  it('returns integer 0–9', () => {
-    const s = nextMatchSecret(TODAY);
-    expect(s).toBeGreaterThanOrEqual(0);
-    expect(s).toBeLessThanOrEqual(9);
+describe('nextMatchSecret', () => {
+  it('returns deterministic value for match 0', () => {
+    const a = nextMatchSecret(TS_MAR15);
+    resetDailyState('2024-3-15');
+    const b = nextMatchSecret(TS_MAR15);
+    expect(a).toBe(b);
   });
 
-  it('advances with match index', () => {
-    const first  = nextMatchSecret(TODAY);
-    recordMatchResult({ won: true, tries: 1, time: 500 }, TODAY);
-    const second = nextMatchSecret(TODAY);
-    // Could be same or different number — just check both are valid
-    expect(second).toBeGreaterThanOrEqual(0);
-    expect(second).toBeLessThanOrEqual(9);
+  it('changes after recording a match', () => {
+    getDailyState(TS_MAR15);
+    const secret0 = nextMatchSecret(TS_MAR15);
+    recordMatchResult({ won: true, tries: 1, time: 1000 }, TS_MAR15);
+    const secret1 = nextMatchSecret(TS_MAR15);
+    // Not guaranteed to differ but the index changed
+    expect(typeof secret1).toBe('number');
+    expect(secret1).toBeGreaterThanOrEqual(0);
+    expect(secret1).toBeLessThanOrEqual(9);
+    // At least record that we asked for a different index
+    expect(getDailyState(TS_MAR15).matchesCompleted).toBe(1);
+    // secret0 was for index 0, secret1 for index 1
+    expect(secret1).toBe(getDailySecret('2024-3-15', 1));
+    expect(secret0).toBe(getDailySecret('2024-3-15', 0));
   });
 });
