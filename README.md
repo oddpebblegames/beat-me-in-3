@@ -2,7 +2,7 @@
 
 > Guess the secret number in 3 tries. 15 seconds. Daily challenge, global leaderboard.
 
-A mobile-first PWA daily number-guessing game. Play in under 2 minutes — three game modes, friend duels, real-time leaderboards.
+A mobile first PWA daily number-guessing game. Play in under 2 minutes — three game modes, friend duels, real-time leaderboards.
 
 ---
 
