@@ -1,0 +1,31 @@
+{
+  "name": "beat-me-in-3",
+  "version": "1.0.0",
+  "description": "A 30-second daily number-guessing game with real-time leaderboards",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:e2e": "playwright test",
+    "lint": "eslint src --ext .js",
+    "lint:fix": "eslint src --ext .js --fix"
+  },
+  "dependencies": {
+    "firebase": "^10.8.0",
+    "html2canvas": "^1.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.0",
+    "@vitest/coverage-v8": "^1.3.1",
+    "@vitest/ui": "^1.3.1",
+    "eslint": "^8.57.0",
+    "jsdom": "^29.0.1",
+    "vite": "^5.1.6",
+    "vite-plugin-pwa": "^0.19.7",
+    "vitest": "^1.3.1"
+  }
+}
