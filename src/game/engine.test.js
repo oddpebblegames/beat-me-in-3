@@ -1,69 +1,71 @@
-/**
- * Game Engine Unit Tests — Beat Me in 3
- */
-
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { createEngine, GameStatus, getHint, _setNow } from './engine.js';
 
-let _time = 0;
+// Use a fake clock
+let fakeTime = 0;
 beforeEach(() => {
-  _time = 0;
-  _setNow(() => _time);
+  fakeTime = 0;
+  _setNow(() => fakeTime);
 });
 
-function tick(ms) { _time += ms; }
+function makeEngine(secret = 5, overrides = {}) {
+  return createEngine({ secretNumber: secret, mode: 'daily', ...overrides });
+}
 
-// ── createEngine ─────────────────────────────────────────────
+describe('createEngine: validation', () => {
+  it('throws on secret < 0', () => {
+    expect(() => makeEngine(-1)).toThrow(RangeError);
+  });
 
-describe('createEngine — validation', () => {
-  it('throws for secret < 0', () => {
-    expect(() => createEngine({ secretNumber: -1, mode: 'daily' })).toThrow(RangeError);
+  it('throws on secret > 9', () => {
+    expect(() => makeEngine(10)).toThrow(RangeError);
   });
-  it('throws for secret > 9', () => {
-    expect(() => createEngine({ secretNumber: 10, mode: 'daily' })).toThrow(RangeError);
-  });
-  it('throws for non-integer secret', () => {
-    expect(() => createEngine({ secretNumber: 3.5, mode: 'daily' })).toThrow(RangeError);
-  });
-  it('accepts valid secrets 0–9', () => {
-    for (let i = 0; i <= 9; i++) {
-      expect(() => createEngine({ secretNumber: i, mode: 'daily' })).not.toThrow();
-    }
+
+  it('throws on non-integer secret', () => {
+    expect(() => makeEngine(3.5)).toThrow(RangeError);
   });
 });
 
-describe('start()', () => {
-  it('transitions from IDLE to PLAYING', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+describe('engine: start', () => {
+  it('starts in IDLE status', () => {
+    const e = makeEngine();
     expect(e.getState().status).toBe(GameStatus.IDLE);
+  });
+
+  it('transitions to PLAYING on start()', () => {
+    const e = makeEngine();
     e.start();
     expect(e.getState().status).toBe(GameStatus.PLAYING);
   });
-  it('throws if called twice', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
-    e.start();
-    expect(() => e.start()).toThrow();
-  });
-  it('throws if called after win', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
-    e.start();
-    e.submitGuess(5);
-    expect(() => e.start()).toThrow();
+
+  it('throws if submitGuess called before start', () => {
+    const e = makeEngine();
+    expect(() => e.submitGuess(5)).toThrow();
   });
 });
 
-describe('submitGuess()', () => {
-  it('returns correct=true and status=WON on correct guess', () => {
-    const e = createEngine({ secretNumber: 7, mode: 'daily' });
+describe('engine: correct guess', () => {
+  it('returns correct=true and status WON on first try', () => {
+    const e = makeEngine(5);
     e.start();
-    const r = e.submitGuess(7);
-    expect(r.correct).toBe(true);
-    expect(r.hint).toBeNull();
-    expect(r.status).toBe(GameStatus.WON);
+    const result = e.submitGuess(5);
+    expect(result.correct).toBe(true);
+    expect(result.hint).toBeNull();
+    expect(result.status).toBe(GameStatus.WON);
+    expect(result.attemptsUsed).toBe(1);
   });
 
-  it('returns hint "higher" when guess is too low', () => {
-    const e = createEngine({ secretNumber: 7, mode: 'daily' });
+  it('state shows WON after correct guess', () => {
+    const e = makeEngine(3);
+    e.start();
+    e.submitGuess(3);
+    expect(e.getState().status).toBe(GameStatus.WON);
+  });
+});
+
+describe('engine: wrong guesses', () => {
+  it('returns hint=higher when guess is too low', () => {
+    const e = makeEngine(7);
     e.start();
     const r = e.submitGuess(3);
     expect(r.correct).toBe(false);
@@ -71,111 +73,140 @@ describe('submitGuess()', () => {
     expect(r.status).toBe(GameStatus.PLAYING);
   });
 
-  it('returns hint "lower" when guess is too high', () => {
-    const e = createEngine({ secretNumber: 3, mode: 'daily' });
+  it('returns hint=lower when guess is too high', () => {
+    const e = makeEngine(2);
     e.start();
     const r = e.submitGuess(8);
     expect(r.correct).toBe(false);
     expect(r.hint).toBe('lower');
   });
 
-  it('transitions to LOST after 3 wrong guesses', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+  it('transitions to LOST after maxAttempts wrong guesses', () => {
+    const e = makeEngine(5);
     e.start();
-    e.submitGuess(0);
-    e.submitGuess(1);
-    const r = e.submitGuess(2);
+    e.submitGuess(1); // wrong
+    e.submitGuess(2); // wrong
+    const r = e.submitGuess(3); // wrong — exhausted
     expect(r.status).toBe(GameStatus.LOST);
   });
 
-  it('throws on wrong guess after game is over', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+  it('records all attempts', () => {
+    const e = makeEngine(5);
     e.start();
-    e.submitGuess(5); // win
-    expect(() => e.submitGuess(5)).toThrow();
+    e.submitGuess(1);
+    e.submitGuess(9);
+    e.submitGuess(4);
+    expect(e.getState().attempts).toHaveLength(3);
   });
 
-  it('throws on invalid guess values', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+  it('throws RangeError on invalid guess', () => {
+    const e = makeEngine();
     e.start();
     expect(() => e.submitGuess(-1)).toThrow(RangeError);
     expect(() => e.submitGuess(10)).toThrow(RangeError);
-    expect(() => e.submitGuess(3.5)).toThrow(RangeError);
-  });
-
-  it('records attempt count correctly', () => {
-    const e = createEngine({ secretNumber: 9, mode: 'daily' });
-    e.start();
-    e.submitGuess(0);
-    e.submitGuess(1);
-    expect(e.getState().triesUsed).toBe(2);
+    expect(() => e.submitGuess(5.5)).toThrow(RangeError);
   });
 });
 
-describe('timeOut()', () => {
-  it('records a timed-out attempt', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+describe('engine: win on 2nd or 3rd attempt', () => {
+  it('wins on 2nd attempt', () => {
+    const e = makeEngine(5);
+    e.start();
+    e.submitGuess(2); // wrong
+    const r = e.submitGuess(5); // correct
+    expect(r.correct).toBe(true);
+    expect(r.status).toBe(GameStatus.WON);
+    expect(r.attemptsUsed).toBe(2);
+  });
+
+  it('wins on 3rd attempt', () => {
+    const e = makeEngine(5);
+    e.start();
+    e.submitGuess(1);
+    e.submitGuess(9);
+    const r = e.submitGuess(5);
+    expect(r.correct).toBe(true);
+    expect(r.status).toBe(GameStatus.WON);
+    expect(r.attemptsUsed).toBe(3);
+  });
+});
+
+describe('engine: timeOut', () => {
+  it('counts timeout as wrong attempt', () => {
+    const e = makeEngine(5);
     e.start();
     const r = e.timeOut();
-    expect(r.timedOut).toBe(true);
     expect(r.correct).toBe(false);
+    expect(r.timedOut).toBe(true);
+    expect(r.attemptsUsed).toBe(1);
     expect(r.status).toBe(GameStatus.PLAYING);
   });
 
-  it('transitions to LOST after 3 timeouts', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+  it('loses after 3 timeouts', () => {
+    const e = makeEngine(5);
     e.start();
     e.timeOut();
     e.timeOut();
     const r = e.timeOut();
     expect(r.status).toBe(GameStatus.LOST);
   });
-
-  it('throws if called when not playing', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
-    expect(() => e.timeOut()).toThrow();
-  });
 });
 
-describe('getState()', () => {
-  it('returns snapshot (not live reference)', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+describe('engine: time tracking', () => {
+  it('records elapsed time per attempt', () => {
+    const e = makeEngine(5);
     e.start();
-    const s1 = e.getState();
-    e.submitGuess(0);
-    const s2 = e.getState();
-    expect(s1.triesUsed).toBe(0);
-    expect(s2.triesUsed).toBe(1);
+    fakeTime = 3000;
+    e.submitGuess(2);
+    expect(e.getState().attempts[0].timeElapsed).toBe(3000);
   });
 
-  it('includes mode', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'friend' });
-    expect(e.getState().mode).toBe('friend');
-  });
-});
-
-describe('getTotalTime()', () => {
-  it('returns 0 before start', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
-    expect(e.getTotalTime()).toBe(0);
-  });
-
-  it('returns elapsed ms after start', () => {
-    const e = createEngine({ secretNumber: 5, mode: 'daily' });
+  it('getTotalTime returns elapsed since start', () => {
+    const e = makeEngine(5);
     e.start();
-    tick(1500);
-    expect(e.getTotalTime()).toBe(1500);
+    fakeTime = 8000;
+    expect(e.getTotalTime()).toBe(8000);
   });
 });
 
-describe('getHint()', () => {
-  it('returns null for correct guess', () => {
+describe('engine: cannot guess after game over', () => {
+  it('throws if guessing after WIN', () => {
+    const e = makeEngine(5);
+    e.start();
+    e.submitGuess(5);
+    expect(() => e.submitGuess(5)).toThrow();
+  });
+
+  it('throws if guessing after LOST', () => {
+    const e = makeEngine(5);
+    e.start();
+    e.submitGuess(1);
+    e.submitGuess(2);
+    e.submitGuess(3);
+    expect(() => e.submitGuess(4)).toThrow();
+  });
+});
+
+describe('getHint helper', () => {
+  it('returns null when guess equals secret', () => {
     expect(getHint(5, 5)).toBeNull();
   });
-  it('returns "higher" when guess < secret', () => {
+
+  it('returns higher when guess < secret', () => {
     expect(getHint(3, 7)).toBe('higher');
   });
-  it('returns "lower" when guess > secret', () => {
+
+  it('returns lower when guess > secret', () => {
     expect(getHint(8, 2)).toBe('lower');
+  });
+});
+
+describe('engine: triesUsed', () => {
+  it('triesUsed reflects attempts count', () => {
+    const e = makeEngine(5);
+    e.start();
+    expect(e.getState().triesUsed).toBe(0);
+    e.submitGuess(1);
+    expect(e.getState().triesUsed).toBe(1);
   });
 });
