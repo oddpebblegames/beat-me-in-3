@@ -11,8 +11,10 @@
 import { getNumber, getString, getBool, subscribe } from '../state/store.js';
 import { isDailyComplete, remainingMatches } from '../game/daily.js';
 import { sfxClick } from '../audio/sfx.js';
+import { watchPlayerCount } from '../utils/player-count.js';
 
 let _countdownInterval = null;
+let _stopPlayerCount   = null;
 
 export function renderHome(container, { onDaily, onQuick, onFriend, onLeaderboard, onStats, onSettings }) {
   container.innerHTML = `
@@ -91,6 +93,12 @@ export function renderHome(container, { onDaily, onQuick, onFriend, onLeaderboar
         <span class="home-lb-arrow" aria-hidden="true">›</span>
       </button>
 
+      <!-- Player count -->
+      <div class="home-player-count" id="home-player-count" aria-live="polite">
+        <span class="home-player-count-num" id="player-count-num">--</span>
+        <span class="home-player-count-label"> players today</span>
+      </div>
+
       <!-- Daily countdown -->
       <div class="home-countdown" id="home-countdown" aria-live="polite">
         <span class="home-countdown-label">Next reset in </span>
@@ -105,12 +113,17 @@ export function renderHome(container, { onDaily, onQuick, onFriend, onLeaderboar
   _updateProfile(container);
   _updateDailyButton(container);
   _startCountdown(container);
+  _startPlayerCount(container);
 }
 
 export function destroyHome() {
   if (_countdownInterval) {
     clearInterval(_countdownInterval);
     _countdownInterval = null;
+  }
+  if (_stopPlayerCount) {
+    _stopPlayerCount();
+    _stopPlayerCount = null;
   }
 }
 
@@ -198,6 +211,13 @@ function _startCountdown(container) {
 
   update();
   _countdownInterval = setInterval(update, 1000);
+}
+
+function _startPlayerCount(container) {
+  _stopPlayerCount = watchPlayerCount((count) => {
+    const el = container.querySelector('#player-count-num');
+    if (el) el.textContent = count;
+  }, 60_000);
 }
 
 function _applyHomeStyles(container) {
@@ -399,6 +419,17 @@ function _applyHomeStyles(container) {
       margin-left: auto;
       font-size: var(--text-xl);
       opacity: 0.5;
+    }
+
+    .home-player-count {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    .home-player-count-num {
+      font-family: var(--font-display);
+      color: var(--color-brand-400);
     }
 
     .home-countdown {
