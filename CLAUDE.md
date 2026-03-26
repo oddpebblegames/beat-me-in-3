@@ -41,6 +41,7 @@ docs/
 [ ] git checkout -b AIAgent/phase-1-docs
 [ ] git add docs/
 [ ] git commit -m "docs: generate project documentation"
+[ ] git push origin AIAgent/phase-1-docs
 ```
 
 **Exit check:** All four files exist and are non-empty. Commit SHA logged.
@@ -68,6 +69,7 @@ Structure:
 [ ] git checkout -b AIAgent/phase-2-roadmap
 [ ] git add docs/ROADMAP.md
 [ ] git commit -m "docs: add product roadmap"
+[ ] git push origin AIAgent/phase-2-roadmap
 ```
 
 **Exit check:** ROADMAP.md contains at minimum Vision + 2 phases grounded in the prompt.
@@ -102,6 +104,7 @@ Types: `SETUP` `FEAT` `FIX` `TEST` `DOCS` `REFACTOR` `INFRA`
 [ ] git checkout -b AIAgent/phase-3-tasks
 [ ] git add docs/TASKS.md
 [ ] git commit -m "docs: add task breakdown"
+[ ] git push origin AIAgent/phase-3-tasks
 ```
 
 **Exit check:** Every task has a branch name. No circular dependencies. Tasks cover MVP scope.
@@ -133,6 +136,7 @@ Tasks:  T001, T002, T003
 [ ] git checkout -b AIAgent/phase-4-sprints
 [ ] git add docs/SPRINTS.md
 [ ] git commit -m "docs: add sprint plan"
+[ ] git push origin AIAgent/phase-4-sprints
 ```
 
 **Exit check:** All tasks from TASKS.md appear in exactly one sprint. No task is orphaned.
@@ -150,7 +154,8 @@ Tasks:  T001, T002, T003
 [ ] Verify:    confirm the definition of done is met
 [ ] Stage:     git add .
 [ ] Commit:    git commit -m "<type>(T00X): <imperative description>"
-[ ] Log:       ✓ T00X committed — AIAgent/T00X-description
+[ ] Push:      git push origin AIAgent/T00X-description
+[ ] Log:       ✓ T00X committed & pushed — AIAgent/T00X-description
 ```
 
 Move to the next task only after the current task is committed.
@@ -181,7 +186,8 @@ BRANCH RULE     All commits → AIAgent/* only. Never touch main/master/dev.
 COMMIT RULE     One task = one commit. No batching.
 ORDER RULE      Docs → Roadmap → Tasks → Sprints → Execution. No skipping.
 DEPS RULE       Never start a task with an incomplete dependency.
-DONE RULE       A task is not complete until committed.
+DONE RULE       A task is not complete until committed and pushed.
+PUSH RULE       Every branch is pushed to origin immediately after its commit.
 CLEAN RULE      Never commit to a dirty working tree from a prior task.
 ```
 
