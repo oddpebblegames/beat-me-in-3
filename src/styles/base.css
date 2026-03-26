@@ -369,6 +369,35 @@ input:focus-visible {
   border-width: 0;
 }
 
+/* Skip-to-content link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 9999;
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-brand-500);
+  color: var(--color-white);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  text-decoration: none;
+  transition: top var(--duration-fast);
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* High-contrast focus ring for all interactive elements */
+:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
