@@ -1,0 +1,25 @@
+{
+  "name": "Beat Me in 3",
+  "short_name": "Beat Me in 3",
+  "description": "Guess the number in 3 tries or less!",
+  "start_url": "https://oddpebblegames.github.io/beat-me-in-3/",
+  "scope": "https://oddpebblegames.github.io/beat-me-in-3/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d2060",
+  "theme_color": "#1a3fa8",
+  "icons": [
+    {
+      "src": "/beat-me-in-3/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/beat-me-in-3/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
