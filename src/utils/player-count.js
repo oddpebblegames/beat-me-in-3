@@ -13,8 +13,6 @@
 
 import { getTodayPlayerCount } from '../firebase/scores.js';
 
-let _interval = null;
-
 /**
  * Start watching the today's player count.
  * Calls `onUpdate(count)` immediately and then every `intervalMs`.

@@ -170,10 +170,6 @@ function _renderRow(entry, isToday, myUID) {
   `;
 }
 
-function sfxNav() {
-  sfxClick();
-}
-
 function _applyStyles(container) {
   if (document.getElementById('lb-styles')) return;
 

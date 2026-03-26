@@ -37,7 +37,7 @@ const BASS_VOL = 0.08;
 // ── State ────────────────────────────────────────────────────
 let _playing = false;
 let _timeoutId = null;
-let _scheduleAheadTime = 0.1; // seconds to schedule ahead
+const _scheduleAheadTime = 0.1; // seconds to schedule ahead
 let _melodyStep = 0;
 let _bassStep = 0;
 let _nextNoteTime = 0;

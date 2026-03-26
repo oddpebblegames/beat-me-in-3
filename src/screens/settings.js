@@ -231,7 +231,7 @@ async function _requestNotifications(overlayEl) {
     set('notifications_enabled', result === 'granted');
     if (result === 'granted') {
       if (btn)      btn.textContent  = 'Enabled ✓';
-      if (feedback) { feedback.textContent = 'You'll be reminded daily!'; feedback.className = 'settings-hint settings-hint--success'; }
+      if (feedback) { feedback.textContent = "You'll be reminded daily!"; feedback.className = 'settings-hint settings-hint--success'; }
     } else {
       if (feedback) { feedback.textContent = 'Permission denied.'; feedback.className = 'settings-hint settings-hint--error'; }
     }
