@@ -9,7 +9,7 @@
  */
 
 const PREFIX = 'bmi3_';
-const listeners = new Map();
+const listeners = new Map(); // key → Set of callbacks
 
 function storageKey(key) {
   return PREFIX + key;
@@ -29,7 +29,7 @@ export function set(key, value) {
   try {
     localStorage.setItem(storageKey(key), JSON.stringify(value));
   } catch {
-    // Storage quota exceeded — degrade gracefully
+    // Storage quota exceeded or unavailable — degrade gracefully
   }
   notify(key, value);
 }
@@ -42,21 +42,37 @@ export function remove(key) {
 export function clear() {
   const keys = Object.keys(localStorage).filter((k) => k.startsWith(PREFIX));
   keys.forEach((k) => localStorage.removeItem(k));
+  // Notify all active subscriptions with null
   listeners.forEach((_, key) => notify(key, null));
 }
 
+/**
+ * Subscribe to changes on a specific key.
+ * @param {string} key
+ * @param {(value: any) => void} callback
+ * @returns {() => void} Unsubscribe function
+ */
 export function subscribe(key, callback) {
-  if (!listeners.has(key)) listeners.set(key, new Set());
+  if (!listeners.has(key)) {
+    listeners.set(key, new Set());
+  }
   listeners.get(key).add(callback);
-  return () => listeners.get(key)?.delete(callback);
+  return () => {
+    listeners.get(key)?.delete(callback);
+  };
 }
 
 function notify(key, value) {
   listeners.get(key)?.forEach((fn) => {
-    try { fn(value); } catch { /* subscriber errors must not break the store */ }
+    try {
+      fn(value);
+    } catch {
+      // Subscriber errors must not break the store
+    }
   });
 }
 
+// Convenience helpers for typed values
 export function getNumber(key, defaultValue = 0) {
   const v = get(key);
   return typeof v === 'number' ? v : defaultValue;
