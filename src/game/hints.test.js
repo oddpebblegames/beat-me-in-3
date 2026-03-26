@@ -1,119 +1,141 @@
-/**
- * Hint System Unit Tests — Beat Me in 3
- */
-
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  getHintsOwned,
-  addHints,
-  getTrialHintUsed,
-  canUseHint,
-  useHint,
-} from './hints.js';
+import { clear, set } from '../state/store.js';
+import { getHintsOwned, addHints, canUseHint, useHint, getTrialHintUsed } from './hints.js';
 
-const _store = {};
-vi.mock('../state/store.js', () => ({
-  get      : (k)    => (k in _store ? _store[k] : null),
-  set      : (k, v) => { _store[k] = v; },
-  getNumber: (k, d) => (typeof _store[k] === 'number' ? _store[k] : d),
-}));
-
-// Mock daily.js getTodayKey
-vi.mock('./daily.js', () => ({
-  getTodayKey: () => '2026-3-26',
-}));
+const TS = Date.UTC(2024, 2, 15, 12, 0, 0);
 
 beforeEach(() => {
-  Object.keys(_store).forEach(k => delete _store[k]);
+  clear();
 });
 
-describe('getHintsOwned()', () => {
-  it('returns 0 with no hints', () => {
-    expect(getHintsOwned()).toBe(0);
-  });
-  it('returns stored count', () => {
-    _store['hints_owned'] = 3;
+describe('addHints', () => {
+  it('increases owned count', () => {
+    addHints(3);
     expect(getHintsOwned()).toBe(3);
   });
-});
 
-describe('addHints()', () => {
-  it('adds to owned count', () => {
+  it('accumulates across calls', () => {
     addHints(2);
-    expect(getHintsOwned()).toBe(2);
-    addHints(3);
-    expect(getHintsOwned()).toBe(5);
+    addHints(5);
+    expect(getHintsOwned()).toBe(7);
   });
-  it('throws for non-positive count', () => {
+
+  it('throws on non-positive count', () => {
     expect(() => addHints(0)).toThrow(RangeError);
     expect(() => addHints(-1)).toThrow(RangeError);
   });
-  it('throws for non-integer count', () => {
+
+  it('throws on non-integer', () => {
     expect(() => addHints(1.5)).toThrow(RangeError);
   });
 });
 
-describe('canUseHint()', () => {
-  it('returns trial when no hints owned and no trial used', () => {
-    const r = canUseHint();
-    expect(r.canUse).toBe(true);
-    expect(r.source).toBe('trial');
+describe('canUseHint', () => {
+  it('returns canUse=true (trial) when no hints and trial not used', () => {
+    const result = canUseHint(TS);
+    expect(result.canUse).toBe(true);
+    expect(result.source).toBe('trial');
   });
 
-  it('returns owned when hints are available', () => {
+  it('returns canUse=true (owned) when hints owned', () => {
     addHints(1);
-    const r = canUseHint();
-    expect(r.canUse).toBe(true);
-    expect(r.source).toBe('owned');
+    const result = canUseHint(TS);
+    expect(result.canUse).toBe(true);
+    expect(result.source).toBe('owned');
   });
 
-  it('returns false when no hints and trial used', () => {
-    _store['trial_hint_2026-3-26'] = true;
-    const r = canUseHint();
-    expect(r.canUse).toBe(false);
+  it('prefers owned over trial', () => {
+    addHints(2);
+    const result = canUseHint(TS);
+    expect(result.source).toBe('owned');
+  });
+
+  it('returns canUse=false when no hints and trial used', () => {
+    useHint(5, TS); // uses trial
+    const result = canUseHint(TS);
+    expect(result.canUse).toBe(false);
+    expect(result.source).toBeNull();
   });
 });
 
-describe('useHint()', () => {
-  it('returns correct ±2 range', () => {
-    const { range } = useHint(5);
+describe('useHint', () => {
+  it('returns a valid range centered on secret', () => {
+    const { range } = useHint(5, TS);
     expect(range[0]).toBe(3);
     expect(range[1]).toBe(7);
   });
 
-  it('clamps range at 0', () => {
-    const { range } = useHint(1);
+  it('clamps range at 0 for secrets near lower bound', () => {
+    const { range } = useHint(1, TS);
     expect(range[0]).toBe(0);
     expect(range[1]).toBe(3);
   });
 
-  it('clamps range at 9', () => {
-    const { range } = useHint(8);
+  it('clamps range at 9 for secrets near upper bound', () => {
+    const { range } = useHint(8, TS);
     expect(range[0]).toBe(6);
     expect(range[1]).toBe(9);
   });
 
-  it('uses owned hint before trial', () => {
-    addHints(2);
-    const { source } = useHint(5);
-    expect(source).toBe('owned');
-    expect(getHintsOwned()).toBe(1);
+  it('clamps both ends for secret=0', () => {
+    const { range } = useHint(0, TS);
+    expect(range[0]).toBe(0);
+    expect(range[1]).toBe(2);
   });
 
-  it('uses trial when no owned hints', () => {
-    const { source } = useHint(5);
+  it('clamps both ends for secret=9', () => {
+    const { range } = useHint(9, TS);
+    expect(range[0]).toBe(7);
+    expect(range[1]).toBe(9);
+  });
+
+  it('deducts from owned count', () => {
+    addHints(3);
+    useHint(5, TS);
+    expect(getHintsOwned()).toBe(2);
+  });
+
+  it('marks trial used when no owned hints', () => {
+    useHint(5, TS);
+    expect(getTrialHintUsed(TS)).toBe(true);
+  });
+
+  it('does not use trial when owned hint available', () => {
+    addHints(1);
+    useHint(5, TS);
+    expect(getTrialHintUsed(TS)).toBe(false);
+    expect(getHintsOwned()).toBe(0);
+  });
+
+  it('throws when no hints available', () => {
+    useHint(5, TS); // uses trial
+    expect(() => useHint(5, TS)).toThrow('No hints available');
+  });
+
+  it('throws on invalid secret', () => {
+    expect(() => useHint(-1, TS)).toThrow(RangeError);
+    expect(() => useHint(10, TS)).toThrow(RangeError);
+    expect(() => useHint(5.5, TS)).toThrow(RangeError);
+  });
+
+  it('returns source=trial when using free trial', () => {
+    const { source } = useHint(5, TS);
     expect(source).toBe('trial');
-    expect(getTrialHintUsed()).toBe(true);
   });
 
-  it('throws after trial + no owned hints', () => {
-    useHint(5); // consumes trial
-    expect(() => useHint(5)).toThrow('No hints available');
+  it('returns source=owned when using owned hint', () => {
+    addHints(1);
+    const { source } = useHint(5, TS);
+    expect(source).toBe('owned');
   });
+});
 
-  it('throws for invalid secret', () => {
-    expect(() => useHint(-1)).toThrow(RangeError);
-    expect(() => useHint(10)).toThrow(RangeError);
-    expect(() => useHint(5.5)).toThrow(RangeError);
+describe('trial hint: daily reset', () => {
+  it('trial is fresh on a new day', () => {
+    const TS_DAY1 = Date.UTC(2024, 2, 15, 10, 0, 0);
+    const TS_DAY2 = Date.UTC(2024, 2, 16, 10, 0, 0);
+    useHint(5, TS_DAY1);
+    expect(getTrialHintUsed(TS_DAY1)).toBe(true);
+    expect(getTrialHintUsed(TS_DAY2)).toBe(false);
   });
 });
